@@ -39,6 +39,9 @@ Thumbs.db
 ### Static uploads ###
 uploads/
 
+### Claude ###
+.claude/
+
 ### Application ###
 *.log
 *.tmp
