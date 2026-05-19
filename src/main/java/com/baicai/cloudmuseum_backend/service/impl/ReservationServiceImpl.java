@@ -53,7 +53,10 @@ public class ReservationServiceImpl implements ReservationService {
                 throw new RuntimeException("该课程仅剩 " + remaining + " 个名额");
             }
 
-            courseMapper.incrementReserved(course.getId(), req.getVisitorCount());
+            int updated = courseMapper.incrementReserved(course.getId(), req.getVisitorCount());
+            if (updated == 0) {
+                throw new RuntimeException("名额占用失败，可能已被其他预约占满");
+            }
         }
 
         Reservation reservation = new Reservation();
@@ -85,6 +88,12 @@ public class ReservationServiceImpl implements ReservationService {
             courseMapper.incrementReserved(reservation.getCourseId(), -reservation.getVisitorCount());
         }
         if (!wasActive && willBeActive && reservation.getCourseId() != null) {
+            Course course = courseMapper.findById(reservation.getCourseId());
+            if (course == null) throw new RuntimeException("课程不存在");
+            int remaining = course.getMaxCapacity() - course.getCurrentReserved();
+            if (reservation.getVisitorCount() > remaining) {
+                throw new RuntimeException("该课程仅剩 " + remaining + " 个名额，无法恢复预约");
+            }
             courseMapper.incrementReserved(reservation.getCourseId(), reservation.getVisitorCount());
         }
 
@@ -103,7 +112,8 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public void delete(Long id) {
         Reservation reservation = getById(id);
-        if ("CONFIRMED".equals(reservation.getStatus()) && reservation.getCourseId() != null) {
+        String status = reservation.getStatus();
+        if (("PENDING".equals(status) || "CONFIRMED".equals(status)) && reservation.getCourseId() != null) {
             courseMapper.incrementReserved(reservation.getCourseId(), -reservation.getVisitorCount());
         }
         reservationMapper.deleteById(id);

@@ -1,6 +1,9 @@
 package com.baicai.cloudmuseum_backend.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class UpdateStatusRequest {
+    @NotBlank(message = "状态不能为空")
     private String status;
 
     public String getStatus() { return status; }

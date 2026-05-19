@@ -48,7 +48,7 @@ public class ReservationController {
     }
 
     @PutMapping("/{id}/status")
-    public ApiResponse<Reservation> updateStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request) {
+    public ApiResponse<Reservation> updateStatus(@PathVariable Long id, @Valid @RequestBody UpdateStatusRequest request) {
         return ApiResponse.ok(reservationService.updateStatus(id, request.getStatus()));
     }
 

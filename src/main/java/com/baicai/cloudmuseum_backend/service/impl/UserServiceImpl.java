@@ -39,6 +39,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user) {
+        if (user.getRole() == null || user.getRole().isEmpty()) {
+            user.setRole("USER");
+        }
         user.setPassword(encoder.encode(user.getPassword()));
         userMapper.insert(user);
         user.setPassword(null);
