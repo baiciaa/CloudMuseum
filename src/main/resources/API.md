@@ -50,7 +50,7 @@
 }
 ```
 
-HTTP 状态码: `400` 表示业务异常，`500` 表示服务器内部错误。
+HTTP 状态码: `400` 表示客户端错误（业务异常、参数校验失败、缺少必填参数），`500` 表示服务器内部错误。
 
 ### 1.3 分页响应
 
@@ -551,6 +551,8 @@ Content-Type: application/json
 > **校验规则:**
 > - `userId`、`visitDate`、`visitorCount`、`contactName`、`contactPhone`、`type` 为必填，缺失返回 400 并提示具体字段
 > - 若 `courseId` 不为空，自动校验该课程 `currentReserved + visitorCount ≤ maxCapacity`，超出则返回错误 `"该课程仅剩 X 个名额"`
+> - 若 `courseId` 不为空且课程状态非 ACTIVE，返回错误 `"课程未开放预约"`
+> - 高并发下若名额被其他事务抢先占用，返回错误 `"名额占用失败，可能已被其他预约占满"`（事务回滚）
 > - 创建成功后自动占用课程名额，状态初始为 `PENDING`
 
 **请求示例:**
@@ -618,7 +620,7 @@ Content-Type: application/json
 
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| `status` | string | **是** | 目标状态: PENDING / CONFIRMED / CANCELLED |
+| `status` | string | **是** | 目标状态: PENDING / CONFIRMED / CANCELLED。不可为空，否则返回 400 |
 
 **请求示例:**
 
@@ -632,7 +634,16 @@ curl -X PUT "http://localhost:8081/api/reservations/42/status" \
 curl -X PUT "http://localhost:8081/api/reservations/42/status" \
   -H "Content-Type: application/json" \
   -d '{"status": "CANCELLED"}'
+
+# 恢复已取消的预约
+curl -X PUT "http://localhost:8081/api/reservations/42/status" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "PENDING"}'
 ```
+
+> **校验规则:**
+> - `status` 为空时返回 `"status: 状态不能为空"`（400）
+> - CANCELLED → PENDING/CONFIRMED 时，重新校验课程剩余名额，不足则返回 `"该课程仅剩 X 个名额，无法恢复预约"`（400）
 
 **响应:** 返回更新后的 `Reservation` 对象。
 
@@ -657,7 +668,7 @@ Content-Type: application/json
 DELETE /api/reservations/{id}
 ```
 
-> 如被删除的是 CONFIRMED 状态的课程预约，将自动释放对应名额。
+> 删除 PENDING 或 CONFIRMED 状态的课程预约时，将自动释放对应名额。CANCELLED 状态的预约不重复释放。
 
 ---
 
