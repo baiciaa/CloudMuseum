@@ -69,6 +69,24 @@ async function loadHistoryContent() {
   `).join('');
 }
 
+// 图片加载失败时的占位 HTML
+function relicImgPlaceholder(name) {
+  return `<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-secondary);font-size:12px;letter-spacing:1px;">
+    <span style="font-size:36px;margin-bottom:8px;">&#x1f3db;</span>
+    <span>${name}</span>
+  </div>`;
+}
+
+// 生成文物图片 HTML，带 onerror 回退
+function relicImgTag(imageUrl, name) {
+  if (!imageUrl) return relicImgPlaceholder(name);
+  const placeholder = relicImgPlaceholder(name);
+  return `<img src="${imageUrl}" alt="${name}" loading="lazy"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+      style="width:100%;height:100%;object-fit:cover;display:block;">
+    <div style="display:none;width:100%;height:100%;">${placeholder}</div>`;
+}
+
 async function loadRelics() {
   const grid = document.getElementById('relic-grid');
   if (!grid) return;
@@ -83,8 +101,8 @@ async function loadRelics() {
 
   grid.innerHTML = relics.map(relic => `
     <div class="relic-card fade-in-up" onclick="window.showRelicDetail(${relic.id})">
-      <div class="card-img" style="background-image:url('${relic.imageUrl || ''}'); background-size:cover; background-position:center;">
-        ${relic.imageUrl ? '' : `[ ${relic.name} 图片 ]`}
+      <div class="card-img">
+        ${relicImgTag(relic.imageUrl, relic.name)}
       </div>
       <div style="padding:20px;">
         <h3 style="font-family:var(--font-display); font-size:13px; letter-spacing:2px; color:var(--gold);">
@@ -105,15 +123,26 @@ window.showRelicDetail = async function(id) {
   const relic = result?.data;
   if (!relic) return;
 
+  const imgBlock = relic.imageUrl
+    ? `<div style="width:100%;max-height:400px;overflow:hidden;background:#f5efe0;margin-bottom:24px;border-radius:2px;position:relative;">
+         <img src="${relic.imageUrl}" alt="${relic.name}" loading="lazy"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+           style="width:100%;max-height:400px;object-fit:contain;display:block;">
+         <div style="display:none;width:100%;height:200px;align-items:center;justify-content:center;color:var(--text-secondary);font-size:14px;">
+           <span style="font-size:48px;margin-right:12px;">&#x1f3db;</span> 图片加载失败
+         </div>
+       </div>`
+    : '';
+
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:2000;display:flex;align-items:center;justify-content:center;';
   overlay.innerHTML = `
     <div style="background:var(--bg-main);max-width:700px;width:90%;max-height:85vh;overflow-y:auto;border-radius:4px;padding:40px;position:relative;">
       <button onclick="this.closest('div').parentElement.remove()" style="position:absolute;top:16px;right:16px;background:none;border:1px solid var(--border-subtle);color:var(--text-secondary);font-size:20px;cursor:pointer;width:36px;height:36px;">&times;</button>
-      ${relic.imageUrl ? `<img src="${relic.imageUrl}" alt="${relic.name}" style="width:100%;max-height:360px;object-fit:contain;background:#f5efe0;margin-bottom:24px;">` : ''}
+      ${imgBlock}
       <h2 style="font-family:var(--font-display); color:var(--gold); letter-spacing:2px; margin-bottom:8px;">${relic.name}</h2>
       <p style="color:var(--text-secondary); font-size:13px; margin-bottom:16px;">${relic.era || '未知年代'} · ${relic.category || '未分类'}</p>
-      <p style="line-height:1.8; color:var(--text-primary);">${relic.description || '暂无详细描述'}</p>
+      <div style="line-height:1.8; color:var(--text-primary);">${relic.description || '暂无详细描述'}</div>
     </div>
   `;
   overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
