@@ -62,8 +62,8 @@ async function loadHistoryContent() {
   grid.innerHTML = articles.map((article, i) => `
     <div class="card fade-in-up delay-${i + 1}">
       <div class="card-title">// ${article.title}</div>
-      <p style="color:var(--text-secondary); line-height:1.8;">
-        ${article.content.replace(/<[^>]*>/g, '').substring(0, 200)}...
+      <p style="color:var(--text-secondary); line-height:1.8; white-space:pre-wrap;">
+        ${article.content.replace(/<[^>]*>/g, '')}
       </p>
     </div>
   `).join('');
@@ -87,20 +87,29 @@ function relicImgTag(imageUrl, name) {
     <div style="display:none;width:100%;height:100%;">${placeholder}</div>`;
 }
 
-async function loadRelics() {
+// 文物分页状态
+let relicsState = { allRelics: [], currentPage: 0, perPage: 12, totalPages: 0 };
+
+function calcPerPage() {
   const grid = document.getElementById('relic-grid');
-  if (!grid) return;
+  if (!grid) return 12;
+  const gridWidth = grid.clientWidth;
+  const gridHeight = window.innerHeight * 0.65; // 约65%视口高度给文物卡片区
+  const cardMinWidth = 280;
+  const cardHeight = 360;  // 图片220 + 内边距 + 文字
+  const cols = Math.max(1, Math.floor(gridWidth / cardMinWidth));
+  const rows = Math.max(1, Math.floor(gridHeight / cardHeight));
+  return cols * rows;
+}
 
-  const result = await relicApi.list('', '', 1, 8);
-  const relics = result?.data?.list || [];
+function renderRelicPage(relics, page, perPage) {
+  const start = page * perPage;
+  const end = Math.min(start + perPage, relics.length);
+  const pageRelics = relics.slice(start, end);
 
-  if (relics.length === 0) {
-    grid.innerHTML = '<p style="color:var(--text-secondary); grid-column:1/-1;">暂无文物数据</p>';
-    return;
-  }
-
-  grid.innerHTML = relics.map(relic => `
-    <div class="relic-card fade-in-up" onclick="window.showRelicDetail(${relic.id})">
+  const grid = document.getElementById('relic-grid');
+  grid.innerHTML = pageRelics.map((relic, i) => `
+    <div class="relic-card fade-in-up delay-${(i % 6) + 1}" onclick="window.showRelicDetail(${relic.id})">
       <div class="card-img">
         ${relicImgTag(relic.imageUrl, relic.name)}
       </div>
@@ -110,11 +119,91 @@ async function loadRelics() {
           ${relic.era ? `<span style="font-size:11px; color:var(--text-secondary);">· ${relic.era}</span>` : ''}
         </h3>
         <p style="color:var(--text-secondary); font-size:13px; margin-top:8px;">
-          ${relic.description ? relic.description.substring(0, 80) + '...' : '暂无描述'}
+          ${relic.description ? relic.description.substring(0, 60) + '...' : '暂无描述'}
         </p>
       </div>
     </div>
   `).join('');
+
+  // 更新分页控件
+  renderPagination(relics.length, page, perPage);
+}
+
+function renderPagination(total, currentPage, perPage) {
+  const totalPages = Math.ceil(total / perPage);
+  const container = document.getElementById('relic-pagination');
+  if (!container || totalPages <= 1) {
+    if (container) container.innerHTML = '';
+    return;
+  }
+
+  const start = currentPage * perPage + 1;
+  const end = Math.min((currentPage + 1) * perPage, total);
+
+  container.innerHTML = `
+    <div style="display:flex; align-items:center; justify-content:center; gap:20px; margin-top:24px;">
+      <button class="btn-primary" onclick="window.relicPrevPage()"
+        ${currentPage === 0 ? 'disabled style="opacity:0.3;cursor:default;"' : ''}
+        style="padding:8px 20px; font-size:12px;">← 上一页</button>
+      <span style="color:var(--text-secondary); font-size:13px;">
+        ${start}-${end} / ${total}
+      </span>
+      <button class="btn-primary" onclick="window.relicNextPage()"
+        ${currentPage >= totalPages - 1 ? 'disabled style="opacity:0.3;cursor:default;"' : ''}
+        style="padding:8px 20px; font-size:12px;">下一页 →</button>
+    </div>
+  `;
+}
+
+window.relicPrevPage = function() {
+  if (relicsState.currentPage > 0) {
+    relicsState.currentPage--;
+    renderRelicPage(relicsState.allRelics, relicsState.currentPage, relicsState.perPage);
+  }
+};
+
+window.relicNextPage = function() {
+  if (relicsState.currentPage < relicsState.totalPages - 1) {
+    relicsState.currentPage++;
+    renderRelicPage(relicsState.allRelics, relicsState.currentPage, relicsState.perPage);
+  }
+};
+
+async function loadRelics() {
+  const grid = document.getElementById('relic-grid');
+  if (!grid) return;
+
+  const perPage = calcPerPage();
+  // 一次性加载全部数据，前端分页
+  const result = await relicApi.list('', '', 1, 200);
+  const relics = result?.data?.list || [];
+
+  if (relics.length === 0) {
+    grid.innerHTML = '<p style="color:var(--text-secondary); grid-column:1/-1;">暂无文物数据</p>';
+    return;
+  }
+
+  relicsState = {
+    allRelics: relics,
+    currentPage: 0,
+    perPage: perPage,
+    totalPages: Math.ceil(relics.length / perPage)
+  };
+
+  renderRelicPage(relics, 0, perPage);
+
+  // 窗口大小变化时重新计算
+  window.addEventListener('resize', () => {
+    const newPerPage = calcPerPage();
+    if (newPerPage !== relicsState.perPage) {
+      relicsState.perPage = newPerPage;
+      relicsState.totalPages = Math.ceil(relicsState.allRelics.length / newPerPage);
+      if (relicsState.currentPage >= relicsState.totalPages) {
+        relicsState.currentPage = relicsState.totalPages - 1;
+      }
+      renderRelicPage(relicsState.allRelics, relicsState.currentPage, relicsState.perPage);
+    }
+  });
 }
 
 // 文物详情弹窗
