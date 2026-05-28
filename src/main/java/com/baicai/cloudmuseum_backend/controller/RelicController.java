@@ -3,6 +3,8 @@ package com.baicai.cloudmuseum_backend.controller;
 import com.baicai.cloudmuseum_backend.dto.ApiResponse;
 import com.baicai.cloudmuseum_backend.entity.Relic;
 import com.baicai.cloudmuseum_backend.service.RelicService;
+import com.baicai.cloudmuseum_backend.util.ImageUrlResolver;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,14 +19,21 @@ public class RelicController {
     @Autowired
     private RelicService relicService;
 
+    @Autowired
+    private ImageUrlResolver imageUrlResolver;
+
     @GetMapping
     public ApiResponse<Map<String, Object>> list(
             @RequestParam(required = false) String era,
             @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request) {
         List<Relic> relics = relicService.getAll(era, category, page, size);
         int total = relicService.count(era, category);
+        for (Relic r : relics) {
+            r.setImageUrl(imageUrlResolver.resolve(r.getImageUrl(), request));
+        }
         Map<String, Object> result = new HashMap<>();
         result.put("list", relics);
         result.put("total", total);
@@ -34,8 +43,10 @@ public class RelicController {
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<Relic> getById(@PathVariable Long id) {
-        return ApiResponse.ok(relicService.getById(id));
+    public ApiResponse<Relic> getById(@PathVariable Long id, HttpServletRequest request) {
+        Relic relic = relicService.getById(id);
+        relic.setImageUrl(imageUrlResolver.resolve(relic.getImageUrl(), request));
+        return ApiResponse.ok(relic);
     }
 
     @PostMapping

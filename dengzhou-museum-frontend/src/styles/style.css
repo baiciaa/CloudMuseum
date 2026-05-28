@@ -1,0 +1,102 @@
+/* ==================== 设计体系 - 登州博物馆 | 金红白配色 ==================== */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Inter:wght@300;400;500;700&display=swap');
+
+:root {
+    /* 暖白古典主调 */
+    --bg-main: #fdfaf5;                /* 全局底色：米白 */
+    --bg-section: #f5efe0;            /* 区块底色：浅驼 */
+    --bg-card: rgba(196, 162, 101, 0.04); /* 卡片底色：极淡金 */
+
+    /* 金色 & 红色 */
+    --gold: #c4a265;                  /* 雅金（主强调色） */
+    --red-accent: #ad3a2f;            /* 朱砂红（辅强调色） */
+
+    /* 文字色 */
+    --text-primary: #3e3232;          /* 深褐色主文字 */
+    --text-secondary: #8c8074;        /* 暖灰色辅助文字 */
+
+    /* 边框 */
+    --border-subtle: rgba(196, 162, 101, 0.2);   /* 淡金边框 */
+    --border-glow: rgba(196, 162, 101, 0.6);     /* 发光金边框 */
+
+    /* 字体体系 */
+    --font-display: 'Noto Serif SC', serif;      /* 展示标题 */
+    --font-body: 'Inter', 'Noto Sans SC', sans-serif; /* 正文 */
+
+    /* 间距与布局 */
+    --space-unit: 8px;
+    --nav-width: 220px;
+    --section-padding: 80px 60px;
+    --transition-speed: 0.3s;
+}
+
+/* ==================== 全局重置 ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    line-height: 1.6;
+    /* 为固定导航留出空间 */
+
+}
+
+/* ==================== 古典纹样背景 ==================== */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c4a265' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ==================== 通用排版 ==================== */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+a {
+    color: var(--gold);
+    text-decoration: none;
+    transition: opacity var(--transition-speed);
+}
+
+a:hover {
+    opacity: 0.8;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ==================== 滚动条美化 ==================== */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-section);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gold);
+    border-radius: 3px;
+}

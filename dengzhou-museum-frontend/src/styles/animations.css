@@ -1,0 +1,97 @@
+/* ========== 加载动画 ========== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes neonPulse {
+    0%, 100% {
+        text-shadow: 0 0 8px var(--gold), 0 0 16px var(--gold);
+    }
+    50% {
+        text-shadow: 0 0 4px var(--gold), 0 0 8px var(--gold);
+    }
+}
+
+@keyframes scanLine {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
+@keyframes borderGlow {
+    0%, 100% {
+        border-color: rgba(196, 162, 101, 0.2);
+    }
+    50% {
+        border-color: rgba(196, 162, 101, 0.6);
+    }
+}
+
+/* ========== 组件动画 ========== */
+@keyframes cardRise {
+    from {
+        transform: translateY(0);
+        box-shadow: none;
+    }
+    to {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(196, 162, 101, 0.08);
+    }
+}
+
+@keyframes ripple {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        width: 200px;
+        height: 200px;
+        opacity: 0;
+    }
+}
+
+/* ========== 工具类 ========== */
+.fade-in-up {
+    opacity: 0;
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.neon-text {
+    animation: neonPulse 2s ease-in-out infinite;
+}
+
+.scan-line::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--gold);
+    box-shadow: 0 0 8px var(--gold);
+    animation: scanLine 3s linear infinite;
+}
+
+/* 延迟动画序列 */
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+.delay-5 { animation-delay: 0.5s; }
