@@ -1,6 +1,6 @@
 # CloudMuseum 后端 API 文档
 
-> 版本: v0.3 | Base URL: `http://localhost:8081` | 字符编码: UTF-8
+> 版本: v0.4 | Base URL: `http://localhost:8081` | 字符编码: UTF-8
 
 ---
 
@@ -1089,4 +1089,4 @@ curl -X POST "http://localhost:8081/api/voice/recognize" \
 app.base-url=
 ```
 
-> 文档生成时间: 2026-05-28 | 适用于 CloudMuseum Backend v0.3 | 如有疑问请联系后端开发
+> 文档生成时间: 2026-05-28 | 适用于 CloudMuseum Backend v0.4 | 如有疑问请联系后端开发
