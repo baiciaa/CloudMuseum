@@ -458,12 +458,13 @@ import { travelApi, chatApi } from './api/index.js';
 
 // ==================== 聊天窗状态 ====================
 const CHAT_STORAGE_KEY = 'dengzhou_chat_history';
-const AI_CHECK_COOLDOWN = 60000;  // AI 检测冷却时间 60 秒
-let chatContext = null;     // { initialized, aiAvailable }
-let chatHistory = [];       // [{ role, content }]
+const AI_CHECK_COOLDOWN = 60000;
+let chatContext = null;
+let chatHistory = [];
 let isTyping = false;
-let chatBusy = false;       // AI 回复期间锁定输入
-let chatOpening = false;    // 防止重复打开
+let chatBusy = false;
+let abortController = null;
+let typewriterState = null;   // { el, fullText, currentIndex, timerId }
 let aiCheckCache = { timestamp: 0, available: false };
 
 async function checkAiAvailability() {
@@ -595,30 +596,47 @@ function createChatDialog() {
 }
 
 window.closeTravelChat = function() {
+  // 取消进行中的 AI 请求
+  if (abortController) {
+    abortController.abort();
+    abortController = null;
+    chatBusy = false;
+    setChatInputEnabled(true);
+  }
+  // 暂停打字机动画
+  if (typewriterState && typewriterState.timerId) {
+    clearTimeout(typewriterState.timerId);
+    typewriterState.timerId = null;
+  }
+  isTyping = false;
+  removeLastThinkingBubble();
   saveChatToStorage();
   const overlay = document.getElementById('travel-chat-overlay');
-  if (overlay) overlay.remove();
-  chatContext = null;
-  chatHistory = [];
-  isTyping = false;
-  chatOpening = false;
+  if (overlay) overlay.style.display = 'none';
 };
 
 window.clearChatHistory = function() {
+  if (abortController) {
+    abortController.abort();
+    abortController = null;
+  }
+  if (typewriterState && typewriterState.timerId) {
+    clearTimeout(typewriterState.timerId);
+  }
+  typewriterState = null;
+  isTyping = false;
   chatHistory = [];
   chatContext = null;
   clearChatStorage();
   document.getElementById('chat-messages').innerHTML = '';
   chatBusy = false;
   setChatInputEnabled(true);
-  // 触发重新初始化
   window.openTravelChat();
 };
 
 window.toggleDengzhouChat = function() {
-  if (chatOpening) return;
   const overlay = document.getElementById('travel-chat-overlay');
-  if (overlay && overlay.style.display === 'flex') {
+  if (overlay && overlay.style.display !== 'none') {
     window.closeTravelChat();
   } else {
     window.openTravelChat();
@@ -626,32 +644,32 @@ window.toggleDengzhouChat = function() {
 };
 
 window.openTravelChat = async function() {
-  if (chatOpening) return;
-  chatOpening = true;
   createChatDialog();
   const overlay = document.getElementById('travel-chat-overlay');
   overlay.style.display = 'flex';
 
+  // 恢复暂停的打字机动画
+  if (typewriterState && typewriterState.fullText) {
+    resumeTypewriter();
+    return;
+  }
+
   if (!chatContext) {
-    // 尝试从 localStorage 恢复历史记录
     const saved = loadChatFromStorage();
     if (saved) {
       chatContext = saved.context || { initialized: true, aiAvailable: false };
       chatHistory = saved.history;
       document.getElementById('chat-messages').innerHTML = '';
-      // 渲染历史消息（不带动画）
       chatHistory.forEach(m => addChatBubble(m.role, m.content, false, false));
-      // 快速检测 AI 状态（带缓存）
       chatContext.aiAvailable = await checkAiAvailability();
       if (!chatContext.aiAvailable && !document.querySelector('.chat-warning')) {
         addChatBubble('warning', '⚠️ AI 服务暂未开启，浏览历史记录中。');
       }
       saveChatToStorage();
-      chatOpening = false;
+      setChatInputEnabled(!chatBusy);
       return;
     }
 
-    // 先检测 AI 服务是否可用（带缓存）
     addChatBubble('assistant', '', true);
     setChatInputEnabled(false);
     chatContext.aiAvailable = await checkAiAvailability();
@@ -667,8 +685,9 @@ window.openTravelChat = async function() {
     chatHistory.push({ role: 'assistant', content: greeting });
     addChatBubble('assistant', greeting, false, true);
     saveChatToStorage();
+  } else {
+    setChatInputEnabled(!chatBusy);
   }
-  chatOpening = false;
 };
 
 function removeLastThinkingBubble() {
@@ -698,19 +717,46 @@ function addChatBubble(role, text, isThinking, animate) {
   msgs.scrollTop = msgs.scrollHeight;
 }
 
-function typewriterEffect(el, text) {
-  let i = 0;
-  el.textContent = '';
+function typewriterEffect(el, text, startIndex = 0) {
+  if (startIndex === 0) el.textContent = '';
   isTyping = true;
+  typewriterState = { el, fullText: text, currentIndex: startIndex };
+
   function tick() {
-    if (i < text.length) {
-      el.textContent += text.charAt(i);
-      i++;
+    const state = typewriterState;
+    if (!state) return;
+    if (state.currentIndex < state.fullText.length) {
+      state.el.textContent += state.fullText.charAt(state.currentIndex);
+      state.currentIndex++;
       const msgs = document.getElementById('chat-messages');
-      msgs.scrollTop = msgs.scrollHeight;
-      setTimeout(tick, 20 + Math.random() * 30);
+      if (msgs) msgs.scrollTop = msgs.scrollHeight;
+      state.timerId = setTimeout(tick, 20 + Math.random() * 30);
     } else {
       isTyping = false;
+      typewriterState = null;
+      setChatInputEnabled(true);
+    }
+  }
+  tick();
+}
+
+function resumeTypewriter() {
+  if (!typewriterState) return;
+  isTyping = true;
+  setChatInputEnabled(false);
+
+  function tick() {
+    const state = typewriterState;
+    if (!state) return;
+    if (state.currentIndex < state.fullText.length) {
+      state.el.textContent += state.fullText.charAt(state.currentIndex);
+      state.currentIndex++;
+      const msgs = document.getElementById('chat-messages');
+      if (msgs) msgs.scrollTop = msgs.scrollHeight;
+      state.timerId = setTimeout(tick, 20 + Math.random() * 30);
+    } else {
+      isTyping = false;
+      typewriterState = null;
       setChatInputEnabled(true);
     }
   }
@@ -718,7 +764,7 @@ function typewriterEffect(el, text) {
 }
 
 window.sendChatMessage = async function() {
-  if (chatBusy) return;
+  if (chatBusy || isTyping) return;
   const input = document.getElementById('chat-input');
   const text = input.value.trim();
   if (!text) return;
@@ -727,11 +773,8 @@ window.sendChatMessage = async function() {
 
   chatHistory.push({ role: 'user', content: text });
   addChatBubble('user', text);
-
-  // 添加思考动画
   addChatBubble('assistant', '', true);
 
-  // 构建带历史上下文的 prompt
   let historyStr = chatHistory.slice(0, -1).map(m => `${m.role === 'user' ? '用户' : 'AI'}: ${m.content}`).join('\n');
   const prompt = `你是"登州小吏"，登州博物馆的云端导览使，一位学识渊博、谈吐文雅的博物馆讲解员。
 登州博物馆位于山东蓬莱，是东方海上丝绸之路始发港，也是戚继光故乡。
@@ -746,10 +789,12 @@ ${historyStr}
 
 请以登州小吏的口吻回复：`;
 
+  abortController = new AbortController();
+
   try {
     const aiReady = chatContext?.aiAvailable ?? await checkAiAvailability();
     if (!aiReady) throw new Error('AI unavailable');
-    const res = await chatApi.ask(prompt);
+    const res = await chatApi.ask(prompt, abortController.signal);
     if (res.status === 'success' && res.answer) {
       removeLastThinkingBubble();
       chatHistory.push({ role: 'assistant', content: res.answer });
@@ -757,12 +802,17 @@ ${historyStr}
     } else {
       throw new Error('AI unavailable');
     }
-  } catch {
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      // 聊天窗关闭中断请求，closeTravelChat 已处理清理
+      return;
+    }
     removeLastThinkingBubble();
     const fallback = 'AI 服务暂未开启，小吏暂时无法作答。\n\n关于"' + text + '"，阁下可在"重点文物"区浏览馆藏精品，或在"研学中心"了解详情。他日AI上线，小吏定当细细道来。';
     chatHistory.push({ role: 'assistant', content: fallback });
     addChatBubble('assistant', fallback, false, true);
   }
+  abortController = null;
   saveChatToStorage();
 };
 

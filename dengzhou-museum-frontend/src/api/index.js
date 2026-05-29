@@ -10,18 +10,20 @@ const BASE = '/api';
 
 // ==================== 通用请求方法 ====================
 
-async function request(method, path, body) {
+async function request(method, path, body, signal) {
   const opts = {
     method,
     headers: { 'Content-Type': 'application/json' },
   };
   if (body) opts.body = JSON.stringify(body);
+  if (signal) opts.signal = signal;
 
   try {
     const res = await fetch(`${BASE}${path}`, opts);
     const json = await res.json();
     return json;
   } catch (err) {
+    if (err.name === 'AbortError') throw err;
     console.error(`[API] ${method} ${path} 失败:`, err);
     return { success: false, message: err.message };
   }
@@ -180,8 +182,8 @@ export const travelApi = {
 // ==================== AI 对话 API ====================
 
 export const chatApi = {
-  ask(question) {
-    return request('POST', '/chat/ask', { question });
+  ask(question, signal) {
+    return request('POST', '/chat/ask', { question }, signal);
   },
 };
 
