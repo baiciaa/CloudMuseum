@@ -453,7 +453,7 @@ window.enterMuseumTour = enterMuseumTour;
 
 // ==================== AI 攻略生成 ====================
 
-import { getUserLocation, fetchWeather, estimateCrowdLevel, getFallbackPlan, getFallbackPlanText } from './utils/weather.js';
+import { getUserLocation, fetchWeather, estimateCrowdLevel, getFallbackPlan } from './utils/weather.js';
 import { travelApi, chatApi } from './api/index.js';
 
 // ==================== 聊天窗状态 ====================
@@ -555,55 +555,18 @@ window.openTravelChat = async function() {
   const overlay = document.getElementById('travel-chat-overlay');
   overlay.style.display = 'flex';
 
-  // 首次打开时获取上下文并自动发起攻略请求
   if (!chatContext) {
-    const location = await getUserLocation();
-    const weather = await fetchWeather(location.adcode);
-    const crowdLevel = estimateCrowdLevel(new Date().toISOString().split('T')[0]);
-    chatContext = { city: location.city, weather, crowdLevel };
+    chatContext = { initialized: true };
+    chatHistory = [];
 
-    // 更新天气面板
-    const locEl = document.getElementById('user-location');
-    const weatherEl = document.getElementById('weather-info');
-    const crowdEl = document.getElementById('crowd-info');
-    if (locEl) locEl.textContent = location.city;
-    if (weatherEl && weather) {
-      const today = weather.current;
-      weatherEl.innerHTML = `${today.dayweather} ${today.nighttemp}°~${today.daytemp}°`;
-    }
-    if (crowdEl) crowdEl.textContent = `预计人流量：${crowdLevel}`;
-
-    // 清除欢迎消息，自动请求攻略
     document.getElementById('chat-messages').innerHTML = '';
-    addChatBubble('assistant', '正在为您分析' + location.city + '的实时数据，生成个性化旅游攻略...', true);
-    await requestTravelGuide();
+
+    const greeting = '在下登州小吏，乃登州博物馆云端导览使。\n\n于此间，我可为您解说馆藏文物之精粹、登州古港之千年沧桑、戚继光之英风烈骨、东方海上丝路之壮阔篇章。\n\n馆中有战国铜剑寒光未褪、西周青铜礼器庄重如初、明清海防火器犹带硝烟——件件皆是蓬莱古港的岁月见证。\n\n若有疑问，尽管道来，小吏愿为君细述。';
+
+    chatHistory.push({ role: 'assistant', content: greeting });
+    addChatBubble('assistant', greeting, false, true);
   }
 };
-
-async function requestTravelGuide() {
-  setChatInputEnabled(false);
-  const ctx = chatContext;
-  const w = ctx.weather?.current;
-  const prompt = `当前条件：所在城市${ctx.city}，天气${w?.dayweather || '未知'}，`
-    + `温度${w?.nighttemp || '?'}°~${w?.daytemp || '?'}°，人流量${ctx.crowdLevel}。`
-    + `请为中小学研学团体生成一份登州博物馆参观攻略，包含：出行建议、参观路线、戚继光文化专线、周边联游。简洁实用，200字以内。`;
-
-  try {
-    const res = await chatApi.ask(prompt);
-    if (res.status === 'success' && res.answer) {
-      removeLastThinkingBubble();
-      chatHistory.push({ role: 'assistant', content: res.answer });
-      addChatBubble('assistant', res.answer, false, true);
-    } else {
-      throw new Error('AI unavailable');
-    }
-  } catch {
-    removeLastThinkingBubble();
-    const fallback = 'AI 服务暂未开启，以下为您提供一份蓬莱博物馆基础游玩攻略：\n\n' + getFallbackPlanText(ctx.city, ctx.weather, ctx.crowdLevel);
-    chatHistory.push({ role: 'assistant', content: fallback });
-    addChatBubble('assistant', fallback, false, true);
-  }
-}
 
 function removeLastThinkingBubble() {
   const msgs = document.getElementById('chat-messages');
@@ -665,18 +628,19 @@ window.sendChatMessage = async function() {
   addChatBubble('assistant', '', true);
 
   // 构建带历史上下文的 prompt
-  const ctx = chatContext || { city: '烟台', weather: null, crowdLevel: '中' };
   let historyStr = chatHistory.slice(0, -1).map(m => `${m.role === 'user' ? '用户' : 'AI'}: ${m.content}`).join('\n');
-  const prompt = `你是一位登州博物馆旅行顾问。登州博物馆在山东蓬莱，戚继光故乡，东方海上丝绸之路始发港。
-开放时间：夏季9:00-18:00，冬季9:00-17:00，周一闭馆，免费参观。
-当前用户所在城市：${ctx.city}。
+  const prompt = `你是"登州小吏"，登州博物馆的云端导览使，一位学识渊博、谈吐文雅的博物馆讲解员。
+登州博物馆位于山东蓬莱，是东方海上丝绸之路始发港，也是戚继光故乡。
+馆藏文物涵盖战国至明清：青铜器、陶瓷、书画、海防兵器等。
+你的职责是为游客介绍文物背后的历史故事、登州古港的兴衰、戚继光的抗倭事迹、海上丝路的文化交流。
+说话风格：半文半白，谦和有力，偶尔引用古诗词。每次回复控制在200字以内。
 
 对话历史：
 ${historyStr}
 
-用户最新问题：${text}
+游客最新问题：${text}
 
-请简洁回复（200字以内）。`;
+请以登州小吏的口吻回复：`;
 
   try {
     const res = await chatApi.ask(prompt);
@@ -689,7 +653,7 @@ ${historyStr}
     }
   } catch {
     removeLastThinkingBubble();
-    const fallback = 'AI 服务暂未开启。\n\n关于"' + text + '"，建议您参考博物馆提供的研学课程和参观攻略。如需详细帮助，请关注「烟台市蓬莱区登州博物馆」微信公众号获取最新信息。';
+    const fallback = 'AI 服务暂未开启，小吏暂时无法作答。\n\n关于"' + text + '"，阁下可在"重点文物"区浏览馆藏精品，或在"研学中心"了解详情。他日AI上线，小吏定当细细道来。';
     chatHistory.push({ role: 'assistant', content: fallback });
     addChatBubble('assistant', fallback, false, true);
   }
