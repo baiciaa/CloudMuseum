@@ -596,6 +596,15 @@ window.clearChatHistory = function() {
   window.openTravelChat();
 };
 
+window.toggleDengzhouChat = function() {
+  const overlay = document.getElementById('travel-chat-overlay');
+  if (overlay && overlay.style.display === 'flex') {
+    window.closeTravelChat();
+  } else {
+    window.openTravelChat();
+  }
+};
+
 window.openTravelChat = async function() {
   createChatDialog();
   const overlay = document.getElementById('travel-chat-overlay');

@@ -763,9 +763,9 @@
 /* ==================== 浮动按钮 - 登州小吏入口 ==================== */
 .float-dengzhou {
     position: fixed;
-    bottom: 28px; right: 28px;
+    bottom: 100px; right: 28px;
     width: 64px; height: 64px;
-    z-index: 1400;
+    z-index: 1600;
     cursor: pointer;
     animation: floatIdle 3s ease-in-out infinite;
 }
