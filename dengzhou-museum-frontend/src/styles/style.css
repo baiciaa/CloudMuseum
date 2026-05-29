@@ -100,3 +100,154 @@ img {
     background: var(--gold);
     border-radius: 3px;
 }
+
+/* ==================== 历史时间线 ==================== */
+.history-timeline {
+    position: relative;
+    max-width: 900px;
+    margin: 50px auto 0;
+    padding-left: 0;
+}
+
+.timeline-item {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 60px;
+    position: relative;
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+/* 时间线标记 */
+.timeline-marker {
+    position: relative;
+    flex-shrink: 0;
+    width: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.timeline-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid var(--bg-main);
+    box-shadow: 0 0 0 3px var(--border-subtle), 0 0 12px rgba(196, 162, 101, 0.3);
+    z-index: 1;
+    flex-shrink: 0;
+    transition: all 0.3s;
+}
+
+.timeline-item:hover .timeline-dot {
+    box-shadow: 0 0 0 3px var(--border-glow), 0 0 20px rgba(196, 162, 101, 0.5);
+    transform: scale(1.2);
+}
+
+.timeline-line {
+    position: absolute;
+    top: 14px;
+    width: 1px;
+    height: calc(100% + 60px);
+    background: linear-gradient(to bottom, var(--border-subtle), var(--border-glow), var(--border-subtle));
+}
+
+/* 时间线内容卡片 */
+.timeline-content {
+    flex: 1;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 2px;
+    padding: 32px 36px;
+    transition: all 0.3s;
+    position: relative;
+    min-width: 0;
+}
+
+.timeline-content::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 20px;
+    width: 8px;
+    height: 1px;
+    background: var(--border-subtle);
+}
+
+.timeline-item:hover .timeline-content {
+    border-color: var(--border-glow);
+    box-shadow: 0 4px 20px rgba(196, 162, 101, 0.06);
+    transform: translateX(4px);
+}
+
+.timeline-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    color: var(--text-primary);
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+    line-height: 1.4;
+    position: relative;
+    padding-bottom: 16px;
+}
+
+.timeline-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: var(--gold);
+}
+
+.timeline-excerpt {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.9;
+    margin-bottom: 16px;
+}
+
+.timeline-more {
+    background: none;
+    border: none;
+    color: var(--gold);
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s;
+}
+
+.timeline-more:hover {
+    color: var(--red-accent);
+    letter-spacing: 3px;
+}
+
+/* 移动端时间线适配 */
+@media (max-width: 768px) {
+    .timeline-item {
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .timeline-marker {
+        width: 30px;
+    }
+
+    .timeline-content {
+        padding: 24px 20px;
+    }
+
+    .timeline-title {
+        font-size: 17px;
+    }
+
+    .timeline-excerpt {
+        font-size: 13px;
+    }
+}

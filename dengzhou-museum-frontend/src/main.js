@@ -55,19 +55,48 @@ async function loadHistoryContent() {
   const articles = result?.data?.list || [];
 
   if (articles.length === 0) {
-    grid.innerHTML = '<p style="color:var(--text-secondary); grid-column:1/-1;">暂无历史内容</p>';
+    grid.innerHTML = '<p style="color:var(--text-secondary);">暂无历史内容</p>';
     return;
   }
 
-  grid.innerHTML = articles.map((article, i) => `
-    <div class="card fade-in-up delay-${i + 1}">
-      <div class="card-title">// ${article.title}</div>
-      <p style="color:var(--text-secondary); line-height:1.8; white-space:pre-wrap;">
-        ${article.content.replace(/<[^>]*>/g, '')}
-      </p>
-    </div>
-  `).join('');
+  grid.innerHTML = articles.map((article, i) => {
+    const side = i % 2 === 0 ? 'left' : 'right';
+    const excerpt = article.content.replace(/<[^>]*>/g, '').substring(0, 120) + '...';
+    return `
+      <div class="timeline-item ${side} fade-in-up delay-${i + 1}">
+        <div class="timeline-marker">
+          <div class="timeline-dot"></div>
+          ${i < articles.length - 1 ? '<div class="timeline-line"></div>' : ''}
+        </div>
+        <div class="timeline-content">
+          <div class="timeline-year">${article.title}</div>
+          <h3 class="timeline-title">${article.title}</h3>
+          <p class="timeline-excerpt">${excerpt}</p>
+          <button class="timeline-more" onclick="window.showHistoryDetail(${article.id})">
+            阅读更多 →
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
+
+window.showHistoryDetail = async function(id) {
+  const result = await articleApi.getById(id);
+  const article = result?.data;
+  if (!article) return;
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:2000;display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML = `
+    <div style="background:var(--bg-main);max-width:800px;width:90%;max-height:85vh;overflow-y:auto;border-radius:4px;padding:40px;position:relative;border:1px solid var(--border-subtle);">
+      <button onclick="this.closest('div').parentElement.remove()" style="position:absolute;top:16px;right:16px;background:none;border:1px solid var(--border-subtle);color:var(--text-secondary);font-size:20px;cursor:pointer;width:36px;height:36px;line-height:36px;">&times;</button>
+      <h2 style="font-family:var(--font-display); color:var(--gold); letter-spacing:2px; margin-bottom:20px;">${article.title}</h2>
+      <div style="line-height:2; color:var(--text-primary); white-space:pre-wrap;">${article.content.replace(/<[^>]*>/g, '')}</div>
+    </div>
+  `;
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+};
 
 // 图片加载失败时的占位 HTML
 function relicImgPlaceholder(name) {
@@ -94,12 +123,16 @@ function calcPerPage() {
   const grid = document.getElementById('relic-grid');
   if (!grid) return 12;
   const gridWidth = grid.clientWidth;
-  const gridHeight = window.innerHeight * 0.65; // 约65%视口高度给文物卡片区
-  const cardMinWidth = 280;
-  const cardHeight = 360;  // 图片220 + 内边距 + 文字
-  const cols = Math.max(1, Math.floor(gridWidth / cardMinWidth));
+  const gridHeight = window.innerHeight * 0.65;
+  // 列数与CSS断点保持一致: 1400→4, 900→3, 600→2, else 1
+  let cols;
+  if (gridWidth > 1400) cols = 4;
+  else if (gridWidth > 900) cols = 3;
+  else if (gridWidth > 600) cols = 2;
+  else cols = 1;
+  const cardHeight = 360;
   const rows = Math.max(1, Math.floor(gridHeight / cardHeight));
-  return cols * rows;
+  return cols * rows;  // 自动是列数的整数倍
 }
 
 function renderRelicPage(relics, page, perPage) {
@@ -271,9 +304,9 @@ window.generateTourPlan = async function() {
 - 目标受众：中小学研学团体
 - 博物馆开放时间：5-10月9:00-18:00（17:30停止入馆），11-4月9:00-17:00（16:30停止入馆），每周一闭馆
 - 门票：免费（凭身份证入馆）
-- 特色：登州是岳飞故里，博物馆有岳飞专题展区
+- 特色：登州是戚继光故乡，博物馆有戚继光专题展区
 
-请包含：出行建议、参观路线、重点展厅推荐（含岳飞展区）、研学活动建议、周边景点联游（含岳王庙）。`;
+请包含：出行建议、参观路线、重点展厅推荐（含戚继光展区）、研学活动建议、周边景点联游（含戚继光故里）。`;
 
   const resultContainer = document.getElementById('ai-result');
   const resultContent = document.getElementById('ai-result-content');
