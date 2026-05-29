@@ -8,17 +8,17 @@
     --bg-card: rgba(196, 162, 101, 0.04);
 
     /* 金色 & 红色 */
-    --gold: #c4a265;
-    --gold-light: #d4b87a;
-    --gold-dark: #a8894a;
+    --gold: #b8942e;
+    --gold-light: #c9a94a;
+    --gold-dark: #9a7a22;
     --red-accent: #ad3a2f;
     --red-dark: #8b2e25;
     --neon-cyan: #5ba0b8;
 
     /* 文字色 */
-    --text-primary: #3e3232;
-    --text-secondary: #8c8074;
-    --text-muted: #b0a89c;
+    --text-primary: #2a1f1f;
+    --text-secondary: #6b5d50;
+    --text-muted: #8a7c6e;
 
     /* 边框 */
     --border-subtle: rgba(196, 162, 101, 0.2);
