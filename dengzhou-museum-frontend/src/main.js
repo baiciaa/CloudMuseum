@@ -525,7 +525,7 @@ function createChatDialog() {
   overlay.innerHTML = `
     <div class="chat-panel">
       <div class="chat-header">
-        <span class="chat-header-title">&#x1f3eF; 登州博物馆 · AI 旅行顾问</span>
+        <span class="chat-header-title">&#x1f3eF; 登州小吏</span>
         <button class="chat-close" onclick="window.closeTravelChat()">&times;</button>
       </div>
       <div class="chat-messages" id="chat-messages">
