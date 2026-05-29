@@ -184,6 +184,33 @@ const ENTITY_CONFIG = {
             { key: 'scheduleInfo', label: '课程安排(JSON)', type: 'textarea' }
         ]
     },
+    recruitments: {
+        label: '招募',
+        listUrl: '/admin/recruitments',
+        createUrl: '/recruitments',
+        updateUrl: id => `/recruitments/${id}`,
+        deleteUrl: id => `/recruitments/${id}`,
+        listFn: async () => { const r = await api.get('/admin/recruitments'); return r; },
+        fields: [
+            { key: 'id', label: 'ID', width: 60 },
+            { key: 'name', label: '姓名', width: 80 },
+            { key: 'phone', label: '手机号', width: 120 },
+            { key: 'type', label: '类型', width: 80 },
+            { key: 'status', label: '状态', width: 70 },
+            { key: 'school', label: '学校/单位' },
+            { key: 'createdAt', label: '报名时间', width: 160, render: v => v ? new Date(v).toLocaleString() : '-' }
+        ],
+        formFields: [
+            { key: 'name', label: '姓名', required: true },
+            { key: 'phone', label: '手机号', required: true },
+            { key: 'email', label: '邮箱' },
+            { key: 'age', label: '年龄', type: 'number' },
+            { key: 'school', label: '学校/单位' },
+            { key: 'type', label: '类型', type: 'select', options: ['VOLUNTEER', 'ACTIVITY'] },
+            { key: 'status', label: '状态', type: 'select', options: ['PENDING', 'APPROVED', 'REJECTED'] },
+            { key: 'intro', label: '申请理由', type: 'textarea' }
+        ]
+    },
     announcements: {
         label: '资讯',
         listUrl: '/admin/announcements',
@@ -323,6 +350,9 @@ const app = {
                         <li class="nav-item ${hash === 'announcements' ? 'active' : ''}" data-page="announcements">
                             <span class="icon">&#9993;</span><span>资讯管理</span>
                         </li>
+                        <li class="nav-item ${hash === 'recruitments' ? 'active' : ''}" data-page="recruitments">
+                            <span class="icon">&#9997;</span><span>招募管理</span>
+                        </li>
                     </ul>
                     <div class="sidebar-footer">
                         <span>管理员</span>
@@ -353,6 +383,7 @@ const app = {
             case 'courses': await this.renderEntityList(main, 'courses'); break;
             case 'reservations': await this.renderEntityList(main, 'reservations'); break;
             case 'announcements': await this.renderEntityList(main, 'announcements'); break;
+            case 'recruitments': await this.renderEntityList(main, 'recruitments'); break;
         }
     },
 
@@ -512,8 +543,8 @@ const app = {
                             ${item.imageUrl ? `<tr><th>图片</th><td><a href="${esc(item.imageUrl)}" target="_blank">查看原图</a></td></tr>` : ''}
                             ${item.modelUrl ? `<tr><th>3D模型</th><td><a href="${esc(item.modelUrl)}" target="_blank">${esc(item.modelUrl)}</a></td></tr>` : ''}
                             ${item.externalLink ? `<tr><th>外部链接</th><td><a href="${esc(item.externalLink)}" target="_blank">查看详情</a></td></tr>` : ''}
-                            <tr><th>创建时间</th><td>${item.createdAt ? new Date(item.createdAt).toLocaleString() : '-'}</tr>
-                            <tr><th>更新时间</th><td>${item.updatedAt ? new Date(item.updatedAt).toLocaleString() : '-'}</tr>
+                            <tr><th>创建时间</th><td>${item.createdAt ? new Date(item.createdAt).toLocaleString() : '-'}</td></tr>
+                            <tr><th>更新时间</th><td>${item.updatedAt ? new Date(item.updatedAt).toLocaleString() : '-'}</td></tr>
                         </table>
                     </div>
                 </div>
@@ -565,9 +596,12 @@ const app = {
                             <textarea id="field-${f.key}">${esc(val)}</textarea></div>`;
                     }
                     const inputType = f.type || 'text';
+                    const isImageUrl = f.key === 'coverImage';
+                    const displayVal = isImageUrl ? val : esc(val);
+                    const preview = isImageUrl && val ? `<div style="margin-top:6px;"><img src="${val}" style="max-width:200px;max-height:120px;border-radius:4px;border:1px solid var(--border);object-fit:cover;" onerror="this.style.display='none'"></div>` : '';
                     return `<div class="form-group"><label>${f.label}${f.required ? ' *' : ''}</label>
-                        <input type="${inputType}" id="field-${f.key}" value="${esc(val)}" ${f.required && !isEdit ? 'required' : ''}>
-                        ${f.hint ? `<small style="color:#999;font-size:11px">${f.hint}</small>` : ''}</div>`;
+                        <input type="${inputType}" id="field-${f.key}" value="${displayVal}" ${f.required && !isEdit ? 'required' : ''}>
+                        ${f.hint ? `<small style="color:#999;font-size:11px">${f.hint}</small>` : ''}${preview}</div>`;
                 }).join('')}
             </div>
             <div class="modal-footer">
@@ -594,7 +628,8 @@ const app = {
             if (r.success) {
                 overlay.remove();
                 toast(isEdit ? '更新成功' : '创建成功');
-                this.renderEntityList(document.getElementById('main-area'), entity);
+                const main = document.getElementById('main-area');
+                entity === 'relics' ? this.renderRelicGrid(main) : this.renderEntityList(main, entity);
             } else {
                 toast(r.message || '操作失败', 'error');
             }

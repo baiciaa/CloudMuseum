@@ -28,6 +28,9 @@ public interface UserMapper {
     @Update("UPDATE users SET password=#{password} WHERE id=#{id}")
     int updatePassword(@Param("id") Long id, @Param("password") String password);
 
+    @Select("SELECT count(*) FROM users")
+    int countAll();
+
     @Delete("DELETE FROM users WHERE id=#{id}")
     int deleteById(Long id);
 }

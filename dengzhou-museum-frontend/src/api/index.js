@@ -16,7 +16,7 @@ async function request(method, path, body, signal) {
     headers: { 'Content-Type': 'application/json' },
   };
   if (body) opts.body = JSON.stringify(body);
-  if (signal) opts.signal = signal;
+  opts.signal = signal || AbortSignal.timeout(15000);
 
   try {
     const res = await fetch(`${BASE}${path}`, opts);
@@ -223,6 +223,26 @@ export const voiceApi = {
   },
 };
 
+// ==================== 招募报名 API ====================
+
+export const recruitmentApi = {
+  create(data) {
+    return request('POST', '/recruitments', data);
+  },
+  list(type, status) {
+    let query = '/recruitments?';
+    if (type) query += `type=${type}`;
+    if (status) query += `&status=${status}`;
+    return request('GET', query);
+  },
+  updateStatus(id, status) {
+    return request('PUT', `/recruitments/${id}/status`, { status });
+  },
+  delete(id) {
+    return request('DELETE', `/recruitments/${id}`);
+  },
+};
+
 // ==================== 文件上传 ====================
 
 export { uploadFile };
@@ -238,5 +258,6 @@ export default {
   chat: chatApi,
   voice: voiceApi,
   announcement: announcementApi,
+  recruitment: recruitmentApi,
   uploadFile,
 };

@@ -60,6 +60,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public int countAll() {
+        return userMapper.countAll();
+    }
+
+    @Override
     public void delete(Long id) {
         userMapper.deleteById(id);
     }

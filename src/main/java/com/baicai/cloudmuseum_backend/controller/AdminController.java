@@ -5,6 +5,7 @@ import com.baicai.cloudmuseum_backend.dto.ApiResponse;
 import com.baicai.cloudmuseum_backend.entity.Announcement;
 import com.baicai.cloudmuseum_backend.entity.Article;
 import com.baicai.cloudmuseum_backend.entity.Course;
+import com.baicai.cloudmuseum_backend.entity.Recruitment;
 import com.baicai.cloudmuseum_backend.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,6 +29,8 @@ public class AdminController {
     private ReservationService reservationService;
     @Autowired
     private AnnouncementService announcementService;
+    @Autowired
+    private RecruitmentService recruitmentService;
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
@@ -67,12 +70,13 @@ public class AdminController {
     @GetMapping("/stats")
     public ApiResponse<Map<String, Object>> stats() {
         Map<String, Object> stats = new LinkedHashMap<>();
-        stats.put("users", userService.getAll().size());
+        stats.put("users", userService.countAll());
         stats.put("articles", articleService.getAll(null, null).size());
         stats.put("relics", relicService.count(null, null));
         stats.put("courses", courseService.getAll(null).size());
         stats.put("reservations", reservationService.count(null, null, null));
         stats.put("announcements", announcementService.getAll(null, null).size());
+        stats.put("recruitments", recruitmentService.getAll(null, null).size());
         return ApiResponse.ok(stats);
     }
 
@@ -85,6 +89,13 @@ public class AdminController {
     }
 
     /** 管理端资讯列表（含草稿） */
+    @GetMapping("/recruitments")
+    public ApiResponse<List<Recruitment>> recruitments(
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String status) {
+        return ApiResponse.ok(recruitmentService.getAll(type, status));
+    }
+
     @GetMapping("/announcements")
     public ApiResponse<List<Announcement>> announcements(
             @RequestParam(required = false) String type,

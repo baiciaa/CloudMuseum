@@ -10,5 +10,6 @@ public interface UserService {
     User create(User user);
     User update(User user);
     void updatePassword(Long id, String newPassword);
+    int countAll();
     void delete(Long id);
 }

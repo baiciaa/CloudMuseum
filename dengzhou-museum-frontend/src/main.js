@@ -4,7 +4,7 @@
 import './styles/style.css';
 import './styles/components.css';
 import './styles/animations.css';
-import { articleApi, relicApi, courseApi, reservationApi, announcementApi } from './api/index.js';
+import { articleApi, relicApi, courseApi, reservationApi, announcementApi, recruitmentApi } from './api/index.js';
 import { IMAGES } from './config/images.js';
 import { initDigitalHuman } from './three/DigitalHuman.js';
 
@@ -88,6 +88,7 @@ async function loadHistoryContent() {
   const grid = document.getElementById('history-grid');
   if (!grid) return;
 
+  try {
   const result = await articleApi.list('HISTORY', 1, 10);
   const articles = result?.data?.list || [];
 
@@ -116,6 +117,7 @@ async function loadHistoryContent() {
       </div>
     `;
   }).join('');
+  } catch { grid.innerHTML = '<p style="color:var(--text-secondary);">加载失败，请刷新页面重试</p>'; }
 }
 
 window.showHistoryDetail = async function(id) {
@@ -246,6 +248,7 @@ async function loadRelics() {
     <div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text"></div></div>
   `).join('');
 
+  try {
   const result = await relicApi.list('', '', 1, 500);
   const relics = result?.data?.list || [];
 
@@ -262,6 +265,7 @@ async function loadRelics() {
   };
 
   renderRelicPage(relics, 0, perPage);
+  } catch { grid.innerHTML = '<p style="color:var(--text-secondary); grid-column:1/-1;">加载失败，请刷新页面重试</p>'; }
 
   // 窗口大小变化时重新计算
   window.addEventListener('resize', () => {
@@ -383,6 +387,65 @@ function parseSchedule(scheduleJson) {
   }
 }
 
+// ==================== 招募报名弹窗 ====================
+
+window.showRecruitmentModal = function() {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-panel" style="max-width:480px;">
+      <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+      <h2 class="modal-title">招募报名</h2>
+      <form id="recruit-form" style="display:flex;flex-direction:column;gap:14px;">
+        <div><label style="font-size:12px;color:var(--text-secondary);">报名类型 *</label>
+          <select id="recruit-type" style="width:100%;padding:8px 12px;border:1px solid var(--border-subtle);border-radius:4px;font-size:13px;font-family:inherit;margin-top:4px;">
+            <option value="VOLUNTEER">志愿者招募</option>
+            <option value="ACTIVITY">活动参与者</option>
+          </select></div>
+        <div><label style="font-size:12px;color:var(--text-secondary);">姓名 *</label>
+          <input type="text" id="recruit-name" required style="width:100%;padding:8px 12px;border:1px solid var(--border-subtle);border-radius:4px;font-size:13px;margin-top:4px;"></div>
+        <div><label style="font-size:12px;color:var(--text-secondary);">手机号 *</label>
+          <input type="tel" id="recruit-phone" required style="width:100%;padding:8px 12px;border:1px solid var(--border-subtle);border-radius:4px;font-size:13px;margin-top:4px;"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div><label style="font-size:12px;color:var(--text-secondary);">年龄</label>
+            <input type="number" id="recruit-age" style="width:100%;padding:8px 12px;border:1px solid var(--border-subtle);border-radius:4px;font-size:13px;margin-top:4px;"></div>
+          <div><label style="font-size:12px;color:var(--text-secondary);">邮箱</label>
+            <input type="email" id="recruit-email" style="width:100%;padding:8px 12px;border:1px solid var(--border-subtle);border-radius:4px;font-size:13px;margin-top:4px;"></div>
+        </div>
+        <div><label style="font-size:12px;color:var(--text-secondary);">学校/单位</label>
+          <input type="text" id="recruit-school" style="width:100%;padding:8px 12px;border:1px solid var(--border-subtle);border-radius:4px;font-size:13px;margin-top:4px;"></div>
+        <div><label style="font-size:12px;color:var(--text-secondary);">申请理由/简介</label>
+          <textarea id="recruit-intro" rows="3" style="width:100%;padding:8px 12px;border:1px solid var(--border-subtle);border-radius:4px;font-size:13px;font-family:inherit;margin-top:4px;resize:vertical;"></textarea></div>
+        <button type="submit" class="btn-primary" style="margin-top:8px;" id="recruit-submit">提交报名</button>
+      </form>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+
+  document.getElementById('recruit-form').onsubmit = async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('recruit-submit');
+    btn.disabled = true; btn.textContent = '提交中...';
+    const data = {
+      name: document.getElementById('recruit-name').value.trim(),
+      phone: document.getElementById('recruit-phone').value.trim(),
+      type: document.getElementById('recruit-type').value,
+      age: parseInt(document.getElementById('recruit-age').value) || null,
+      email: document.getElementById('recruit-email').value.trim() || null,
+      school: document.getElementById('recruit-school').value.trim() || null,
+      intro: document.getElementById('recruit-intro').value.trim() || null,
+    };
+    if (!data.name || !data.phone) { alert('请填写姓名和手机号'); btn.disabled = false; btn.textContent = '提交报名'; return; }
+    const r = await recruitmentApi.create(data);
+    if (r.success) {
+      overlay.innerHTML = '<div class="modal-panel" style="text-align:center;padding:40px;"><div style="font-size:56px;margin-bottom:16px;">&#x2705;</div><h2 class="modal-title">报名成功</h2><p style="color:var(--text-secondary);margin:16px 0;">感谢您的报名！<br>工作人员将在1-2个工作日内与您联系。</p><button class="btn-primary" onclick="this.closest(\'.modal-overlay\').remove()">关闭</button></div>';
+    } else {
+      alert('提交失败：' + (r.message || '请稍后重试'));
+      btn.disabled = false; btn.textContent = '提交报名';
+    }
+  };
+};
+
 // ==================== 研学中心：预约弹窗 ====================
 
 window.showReservationModal = function(courseId) {
@@ -392,7 +455,7 @@ window.showReservationModal = function(courseId) {
     <div class="modal-panel">
       <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
       <h2 class="modal-title">团体参观预约</h2>
-      <form class="reserve-form" onsubmit="window.submitReservation(event, ${courseId || 'null'})">
+      <form class="reserve-form" onsubmit="window.submitReservation(event, ${courseId || 0})">
         <div class="form-group">
           <label>联系人姓名 *</label>
           <input type="text" name="contactName" required placeholder="请输入联系人姓名">
@@ -435,7 +498,7 @@ window.submitReservation = async function(event, courseId) {
   const data = {
     userId: 1,
     type: 'GROUP',
-    courseId: courseId || null,
+    courseId: courseId || null, // 0 means no course selected
     contactName: form.contactName.value.trim(),
     contactPhone: form.contactPhone.value.trim(),
     visitorCount: parseInt(form.visitorCount.value) || 30,
@@ -877,25 +940,26 @@ async function loadNotices(page, reset) {
 async function loadEduNews(page) {
   const container = document.getElementById('edu-news-list');
   if (!container) return;
-  if (page === 1) container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-secondary);font-size:13px;">加载中...</div>';
+  container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-secondary);font-size:13px;">加载中...</div>';
   const r = await announcementApi.list('EDUCATION', page, 6);
   const list = r.data?.list || [];
-  if (page === 1) container.innerHTML = '';
-  if (list.length === 0 && page === 1) {
+  container.innerHTML = '';
+  if (list.length === 0) {
     container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-secondary);font-size:13px;">暂无研学动态</div>';
     return;
   }
   list.forEach(item => {
     const d = document.createElement('div');
-    d.className = 'relic-card';
-    d.style.cssText = 'cursor:pointer;';
+    d.style.cssText = 'display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--border-subtle);cursor:pointer;';
+    const date = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-CN') : '';
     const imgHtml = item.coverImage
-      ? '<div class="card-img"><img src="' + item.coverImage + '" alt="' + escHtml(item.title) + '" style="width:100%;height:100%;object-fit:cover;" loading="lazy"></div>'
-      : '<div class="card-img" style="display:flex;align-items:center;justify-content:center;color:#ccc;font-size:36px;">&#x1f4f0;</div>';
+      ? '<img src="' + item.coverImage + '" alt="' + escHtml(item.title) + '" style="width:120px;height:80px;object-fit:cover;border-radius:4px;flex-shrink:0;" loading="lazy">'
+      : '<div style="width:120px;height:80px;border-radius:4px;background:#f0ede5;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#ccc;font-size:28px;">&#x1f4f0;</div>';
     d.innerHTML = imgHtml +
-      '<div style="padding:14px;">' +
-        '<div style="font-size:13px;font-weight:600;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escHtml(item.title) + '</div>' +
-        '<div style="font-size:11px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escHtml((item.content||'').slice(0,60)) + '</div>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="font-size:14px;font-weight:600;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escHtml(item.title) + '</div>' +
+        '<div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">' + date + '</div>' +
+        '<div style="font-size:13px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.5;">' + escHtml((item.content||'').slice(0,100)) + '</div>' +
       '</div>';
     d.onclick = () => showAnnouncementDetail(item);
     container.appendChild(d);
