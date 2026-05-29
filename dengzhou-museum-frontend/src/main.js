@@ -4,7 +4,7 @@
 import './styles/style.css';
 import './styles/components.css';
 import './styles/animations.css';
-import { articleApi, relicApi, courseApi, reservationApi } from './api/index.js';
+import { articleApi, relicApi, courseApi, reservationApi, announcementApi } from './api/index.js';
 import { IMAGES } from './config/images.js';
 import { initDigitalHuman } from './three/DigitalHuman.js';
 
@@ -486,7 +486,6 @@ window.enterMuseumTour = enterMuseumTour;
 
 // ==================== AI 攻略生成 ====================
 
-import { getUserLocation, fetchWeather, estimateCrowdLevel } from './utils/weather.js';
 import { chatApi } from './api/index.js';
 
 // ==================== 聊天窗状态 ====================
@@ -818,20 +817,98 @@ document.addEventListener('DOMContentLoaded', async () => {
   loadHistoryContent();
   loadRelics();
 
-  // 加载天气面板
-  const location = await getUserLocation();
-  const weather = await fetchWeather(location.adcode);
-  if (weather) {
-    const locEl = document.getElementById('user-location');
-    const weatherEl = document.getElementById('weather-info');
-    const crowdEl = document.getElementById('crowd-info');
-    if (locEl) locEl.textContent = location.city;
-    if (weatherEl) {
-      const today = weather.current;
-      weatherEl.innerHTML = `${today.dayweather} ${today.nighttemp}°~${today.daytemp}°`;
-    }
-    if (crowdEl) {
-      crowdEl.textContent = `预计人流量：${estimateCrowdLevel(new Date().toISOString().split('T')[0])}`;
-    }
-  }
+  // 加载资讯公告
+  loadNotices(1, true);
+  // 加载研学动态
+  loadEduNews(1);
+
+  window.loadMoreNotices = () => loadNotices(++noticePage, false);
+  window.loadMoreEdu = () => loadEduNews(++eduPage);
 });
+
+// ==================== 资讯公告 & 研学动态 ====================
+let noticePage = 1;
+let eduPage = 1;
+
+async function loadNotices(page, reset) {
+  const container = document.getElementById('notice-list');
+  if (!container) return;
+  if (reset) { noticePage = 1; page = 1; }
+  if (reset) container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-secondary);font-size:13px;">加载中...</div>';
+  const r = await announcementApi.list('NOTICE', page, 5);
+  const list = r.data?.list || [];
+  if (reset) container.innerHTML = '';
+  if (list.length === 0) {
+    if (reset) container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-secondary);font-size:13px;">暂无公告</div>';
+    return;
+  }
+  list.forEach(item => {
+    const d = document.createElement('div');
+    d.style.cssText = 'padding:20px 0;border-bottom:1px solid var(--border-subtle);cursor:pointer;';
+    const date = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-CN') : '';
+    d.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
+        '<span style="font-family:var(--font-display);font-size:15px;letter-spacing:1px;color:var(--text-primary);">' + escHtml(item.title) + '</span>' +
+        '<span style="font-size:11px;color:var(--text-muted);white-space:nowrap;">' + date + '</span>' +
+      '</div>' +
+      '<div style="font-size:13px;color:var(--text-secondary);margin-top:6px;line-height:1.6;">' + escHtml((item.content||'').slice(0,120)) + (item.content&&item.content.length>120?'...':'') + '</div>';
+    d.onclick = () => showAnnouncementDetail(item);
+    container.appendChild(d);
+  });
+  const total = r.data?.total || 0;
+  const loaded = container.querySelectorAll('div').length;
+  const moreBtn = document.getElementById('notice-more');
+  if (moreBtn) moreBtn.style.display = loaded < total ? 'block' : 'none';
+}
+
+async function loadEduNews(page) {
+  const container = document.getElementById('edu-news-list');
+  if (!container) return;
+  if (page === 1) container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-secondary);font-size:13px;">加载中...</div>';
+  const r = await announcementApi.list('EDUCATION', page, 6);
+  const list = r.data?.list || [];
+  if (page === 1) container.innerHTML = '';
+  if (list.length === 0 && page === 1) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-secondary);font-size:13px;">暂无研学动态</div>';
+    return;
+  }
+  list.forEach(item => {
+    const d = document.createElement('div');
+    d.className = 'relic-card';
+    d.style.cssText = 'cursor:pointer;';
+    const imgHtml = item.coverImage
+      ? '<div class="card-img"><img src="' + item.coverImage + '" alt="' + escHtml(item.title) + '" style="width:100%;height:100%;object-fit:cover;" loading="lazy"></div>'
+      : '<div class="card-img" style="display:flex;align-items:center;justify-content:center;color:#ccc;font-size:36px;">&#x1f4f0;</div>';
+    d.innerHTML = imgHtml +
+      '<div style="padding:14px;">' +
+        '<div style="font-size:13px;font-weight:600;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escHtml(item.title) + '</div>' +
+        '<div style="font-size:11px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escHtml((item.content||'').slice(0,60)) + '</div>' +
+      '</div>';
+    d.onclick = () => showAnnouncementDetail(item);
+    container.appendChild(d);
+  });
+  const total = r.data?.total || 0;
+  const loaded = container.querySelectorAll('.relic-card').length;
+  const moreBtn = document.getElementById('edu-more');
+  if (moreBtn) moreBtn.style.display = loaded < total ? 'block' : 'none';
+}
+
+window.showAnnouncementDetail = function(item) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  const date = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-CN') : '';
+  overlay.innerHTML =
+    '<div class="modal-panel" style="max-width:640px;">' +
+      '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>' +
+      '<h2 class="modal-title" style="padding-right:30px;">' + escHtml(item.title) + '</h2>' +
+      '<p style="font-size:11px;color:var(--text-muted);margin-bottom:16px;">' + date + '</p>' +
+      '<div style="font-size:14px;line-height:1.9;color:var(--text-primary);white-space:pre-wrap;">' + escHtml(item.content) + '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+};
+
+function escHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}

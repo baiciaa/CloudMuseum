@@ -184,6 +184,28 @@ const ENTITY_CONFIG = {
             { key: 'scheduleInfo', label: '课程安排(JSON)', type: 'textarea' }
         ]
     },
+    announcements: {
+        label: '资讯',
+        listUrl: '/announcements',
+        createUrl: '/announcements',
+        updateUrl: id => `/announcements/${id}`,
+        deleteUrl: id => `/announcements/${id}`,
+        listFn: async () => { const r = await api.get('/announcements?page=1&size=999'); return r; },
+        fields: [
+            { key: 'id', label: 'ID', width: 60 },
+            { key: 'title', label: '标题', render: v => `<span class="cell-truncate">${esc(v)}</span>` },
+            { key: 'type', label: '类型', width: 80 },
+            { key: 'status', label: '状态', width: 70 },
+            { key: 'createdAt', label: '创建时间', width: 160, render: v => v ? new Date(v).toLocaleString() : '-' }
+        ],
+        formFields: [
+            { key: 'title', label: '标题', required: true },
+            { key: 'type', label: '类型', type: 'select', options: ['NOTICE', 'EDUCATION'], required: true },
+            { key: 'status', label: '状态', type: 'select', options: ['PUBLISHED', 'DRAFT'] },
+            { key: 'coverImage', label: '封面图URL(仅EDUCATION)' },
+            { key: 'content', label: '内容', type: 'textarea', required: true }
+        ]
+    },
     reservations: {
         label: '预约',
         listUrl: '/reservations',
@@ -298,6 +320,9 @@ const app = {
                         <li class="nav-item ${hash === 'reservations' ? 'active' : ''}" data-page="reservations">
                             <span class="icon">&#9992;</span><span>预约管理</span>
                         </li>
+                        <li class="nav-item ${hash === 'announcements' ? 'active' : ''}" data-page="announcements">
+                            <span class="icon">&#9993;</span><span>资讯管理</span>
+                        </li>
                     </ul>
                     <div class="sidebar-footer">
                         <span>管理员</span>
@@ -327,6 +352,7 @@ const app = {
             case 'relics': await this.renderRelicGrid(main); break;
             case 'courses': await this.renderEntityList(main, 'courses'); break;
             case 'reservations': await this.renderEntityList(main, 'reservations'); break;
+            case 'announcements': await this.renderEntityList(main, 'announcements'); break;
         }
     },
 

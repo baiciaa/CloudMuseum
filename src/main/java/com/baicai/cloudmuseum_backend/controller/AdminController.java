@@ -25,6 +25,8 @@ public class AdminController {
     private CourseService courseService;
     @Autowired
     private ReservationService reservationService;
+    @Autowired
+    private AnnouncementService announcementService;
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
@@ -69,6 +71,7 @@ public class AdminController {
         stats.put("relics", relicService.count(null, null));
         stats.put("courses", courseService.getAll(null).size());
         stats.put("reservations", reservationService.count(null, null, null));
+        stats.put("announcements", announcementService.getAll(null, null).size());
         return ApiResponse.ok(stats);
     }
 

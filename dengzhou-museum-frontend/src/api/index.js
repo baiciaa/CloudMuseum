@@ -163,6 +163,32 @@ export const userApi = {
   },
 };
 
+// ==================== 资讯公告 API ====================
+
+export const announcementApi = {
+  list(type, page = 1, size = 10) {
+    let query = `/announcements?page=${page}&size=${size}`;
+    if (type) query += `&type=${type}`;
+    return request('GET', query);
+  },
+
+  getById(id) {
+    return request('GET', `/announcements/${id}`);
+  },
+
+  create(data) {
+    return request('POST', '/announcements', data);
+  },
+
+  update(id, data) {
+    return request('PUT', `/announcements/${id}`, data);
+  },
+
+  delete(id) {
+    return request('DELETE', `/announcements/${id}`);
+  },
+};
+
 // ==================== 天气 API ====================
 
 export const weatherApi = {
@@ -211,5 +237,6 @@ export default {
   travel: travelApi,
   chat: chatApi,
   voice: voiceApi,
+  announcement: announcementApi,
   uploadFile,
 };

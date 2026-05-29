@@ -87,6 +87,20 @@ CREATE TABLE IF NOT EXISTS reservations (
     INDEX idx_visit_date (visit_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='预约表';
 
+-- ========== 资讯公告/研学宣传表 ==========
+CREATE TABLE IF NOT EXISTS announcements (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(256) NOT NULL COMMENT '标题',
+    content TEXT NOT NULL COMMENT '正文',
+    type VARCHAR(16) NOT NULL COMMENT 'NOTICE(官方公告) / EDUCATION(研学宣传)',
+    cover_image VARCHAR(512) DEFAULT NULL COMMENT '封面图(仅EDUCATION)',
+    status VARCHAR(16) NOT NULL DEFAULT 'PUBLISHED' COMMENT 'PUBLISHED / DRAFT',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_type (type),
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='资讯公告/研学宣传表';
+
 -- ========== 初始管理员账号 ==========
 -- 密码 "admin123" 的 BCrypt 哈希
 INSERT INTO users (username, password, role) VALUES
