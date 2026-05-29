@@ -21,8 +21,8 @@
 
 /* ========== 标题光效 ========== */
 @keyframes neonPulse {
-    0%, 100% { text-shadow: 0 0 8px var(--gold), 0 0 16px var(--gold); }
-    50% { text-shadow: 0 0 4px var(--gold), 0 0 8px var(--gold); }
+    0%, 100% { text-shadow: 0 2px 20px rgba(0,0,0,0.3), 0 0 12px var(--gold), 0 0 24px var(--gold); }
+    50% { text-shadow: 0 2px 20px rgba(0,0,0,0.3), 0 0 6px var(--gold), 0 0 16px var(--gold); }
 }
 
 @keyframes textShimmer {
@@ -53,6 +53,41 @@
 @keyframes ripple {
     0% { width: 0; height: 0; opacity: 1; }
     100% { width: 200px; height: 200px; opacity: 0; }
+}
+
+/* ========== Hero 背景轮播-Ken Burns 缩放 ========== */
+@keyframes kenburnsZoom {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+
+/* ========== Hero 图片交叉淡入淡出 ========== */
+@keyframes heroCrossfade {
+    0%, 29%   { opacity: 0; }
+    33%, 62%  { opacity: 1; }
+    66%, 100% { opacity: 0; }
+}
+
+/* ========== 视差滚动 - 背景图偏移 ========== */
+@keyframes parallaxScroll {
+    from { transform: translateY(0); }
+    to { transform: translateY(-15%); }
+}
+
+/* ========== 云纹浮动 ========== */
+@keyframes cloudFloat {
+    0%   { transform: translateX(0) translateY(0); opacity: 0.3; }
+    25%  { opacity: 0.5; }
+    50%  { transform: translateX(30px) translateY(-10px); opacity: 0.35; }
+    75%  { opacity: 0.5; }
+    100% { transform: translateX(0) translateY(0); opacity: 0.3; }
+}
+
+/* ========== 墨迹扩散 ========== */
+@keyframes inkSpread {
+    0%   { clip-path: circle(0% at 50% 50%); opacity: 0; }
+    100% { clip-path: circle(100% at 50% 50%); opacity: 0.06; }
 }
 
 /* ========== 渐现 ========== */

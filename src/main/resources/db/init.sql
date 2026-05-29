@@ -90,4 +90,4 @@ CREATE TABLE IF NOT EXISTS reservations (
 -- ========== 初始管理员账号 ==========
 -- 密码 "admin123" 的 BCrypt 哈希
 INSERT INTO users (username, password, role) VALUES
-    ('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5Eh', 'ADMIN');
+    ('admin', '$2a$10$HuPxpHv.2j3/1mqLPxvz.ePgOC4oQ0nr75EzakGFBV9xzHLbsqKUm', 'ADMIN');

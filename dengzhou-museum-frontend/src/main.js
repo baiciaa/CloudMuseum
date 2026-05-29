@@ -5,6 +5,36 @@ import './styles/style.css';
 import './styles/components.css';
 import './styles/animations.css';
 import { articleApi, relicApi, courseApi, reservationApi } from './api/index.js';
+import { IMAGES } from './config/images.js';
+import { initDigitalHuman } from './three/DigitalHuman.js';
+
+// ==================== 图片初始化 ====================
+
+function initImages() {
+  // Hero 背景轮播
+  const slideshow = document.getElementById('heroBgSlideshow');
+  if (slideshow && IMAGES.heroSlides.length > 0) {
+    slideshow.innerHTML = IMAGES.heroSlides.map((url, i) =>
+      `<div class="hero-bg-slide" style="background-image:url('${url}');"></div>`
+    ).join('');
+  }
+
+  // 云端漫游入口背景
+  if (IMAGES.exploreCover) {
+    const entranceBg = document.querySelector('.tour-entrance-bg');
+    if (entranceBg) {
+      entranceBg.style.backgroundImage = `url('${IMAGES.exploreCover}')`;
+      entranceBg.classList.add('has-image');
+      entranceBg.querySelector('div').style.color = '#fff';
+    }
+  }
+
+  // 板块背景 (启用视差 class)
+  if (IMAGES.textures.history) {
+    document.getElementById('section-history')?.classList.add('has-bg');
+    document.getElementById('section-history').style.backgroundImage = `url('${IMAGES.textures.history}')`;
+  }
+}
 
 // ==================== 导航系统 ====================
 
@@ -27,6 +57,7 @@ function initNavigation() {
 
 // 滚动监听：自动更新导航激活项
 function initScrollSpy() {
+  const floatBtn = document.querySelector('.float-dengzhou');
   window.addEventListener('scroll', () => {
     const sections = document.querySelectorAll('.section');
     const navItems = document.querySelectorAll('.nav-item');
@@ -42,7 +73,13 @@ function initScrollSpy() {
         item.classList.add('active');
       }
     });
+    // 划出首页时显示数字人，在首页时隐藏
+    if (floatBtn) {
+      floatBtn.classList.toggle('hidden', current === 'home');
+    }
   });
+  // 初始状态隐藏
+  if (floatBtn) floatBtn.classList.add('hidden');
 }
 
 // ==================== 动态内容加载 ====================
@@ -117,22 +154,17 @@ function relicImgTag(imageUrl, name) {
 }
 
 // 文物分页状态
-let relicsState = { allRelics: [], currentPage: 0, perPage: 12, totalPages: 0 };
+let relicsState = { allRelics: [], currentPage: 0, perPage: 24, totalPages: 0 };
 
 function calcPerPage() {
   const grid = document.getElementById('relic-grid');
-  if (!grid) return 12;
+  if (!grid) return 24;
   const gridWidth = grid.clientWidth;
-  const gridHeight = window.innerHeight * 0.65;
-  // 列数与CSS断点保持一致: 1400→4, 900→3, 600→2, else 1
-  let cols;
-  if (gridWidth > 1400) cols = 4;
-  else if (gridWidth > 900) cols = 3;
-  else if (gridWidth > 600) cols = 2;
-  else cols = 1;
-  const cardHeight = 360;
-  const rows = Math.max(1, Math.floor(gridHeight / cardHeight));
-  return cols * rows;  // 自动是列数的整数倍
+  const minCardWidth = 240;
+  const gap = 20;
+  const cols = Math.max(1, Math.floor((gridWidth + gap) / (minCardWidth + gap)));
+  const rows = 4;
+  return cols * rows;
 }
 
 function renderRelicPage(relics, page, perPage) {
@@ -145,6 +177,7 @@ function renderRelicPage(relics, page, perPage) {
     <div class="relic-card fade-in-up delay-${(i % 6) + 1}" onclick="window.showRelicDetail(${relic.id})">
       <div class="card-img">
         ${relicImgTag(relic.imageUrl, relic.name)}
+        ${relic.era ? `<span class="img-label">${relic.era}</span>` : ''}
       </div>
       <div style="padding:20px;">
         <h3 style="font-family:var(--font-display); font-size:13px; letter-spacing:2px; color:var(--gold);">
@@ -213,7 +246,7 @@ async function loadRelics() {
     <div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text"></div></div>
   `).join('');
 
-  const result = await relicApi.list('', '', 1, 200);
+  const result = await relicApi.list('', '', 1, 500);
   const relics = result?.data?.list || [];
 
   if (relics.length === 0) {
@@ -596,6 +629,9 @@ function createChatDialog() {
 }
 
 window.closeTravelChat = function() {
+  // 数字人回到原位
+  const dh = document.querySelector('.float-dengzhou');
+  if (dh) dh.classList.remove('chat-open');
   // 取消进行中的 AI 请求
   if (abortController) {
     abortController.abort();
@@ -647,6 +683,9 @@ window.openTravelChat = async function() {
   createChatDialog();
   const overlay = document.getElementById('travel-chat-overlay');
   overlay.style.display = 'flex';
+  // 数字人移到左下角
+  const dh = document.querySelector('.float-dengzhou');
+  if (dh) dh.classList.add('chat-open');
 
   // 恢复暂停的打字机动画
   if (typewriterState && typewriterState.fullText) {
@@ -657,34 +696,27 @@ window.openTravelChat = async function() {
   if (!chatContext) {
     const saved = loadChatFromStorage();
     if (saved) {
-      chatContext = saved.context || { initialized: true, aiAvailable: false };
+      chatContext = saved.context || { initialized: true, aiAvailable: true };
       chatHistory = saved.history;
       document.getElementById('chat-messages').innerHTML = '';
       chatHistory.forEach(m => addChatBubble(m.role, m.content, false, false));
-      chatContext.aiAvailable = await checkAiAvailability();
-      if (!chatContext.aiAvailable && !document.querySelector('.chat-warning')) {
-        addChatBubble('warning', '⚠️ AI 服务暂未开启，浏览历史记录中。');
-      }
-      saveChatToStorage();
       setChatInputEnabled(!chatBusy);
+      saveChatToStorage();
       return;
     }
 
-    addChatBubble('assistant', '', true);
-    setChatInputEnabled(false);
-    chatContext.aiAvailable = await checkAiAvailability();
-    const aiOk = chatContext.aiAvailable;
-    removeLastThinkingBubble();
-
     const greeting = '在下登州小吏，乃登州博物馆云端导览使。\n\n于此间，我可为您解说馆藏文物之精粹、登州古港之千年沧桑、戚继光之英风烈骨、东方海上丝路之壮阔篇章。\n\n馆中有战国铜剑寒光未褪、西周青铜礼器庄重如初、明清海防火器犹带硝烟——件件皆是蓬莱古港的岁月见证。\n\n若有疑问，尽管道来，小吏愿为君细述。';
 
-    if (!aiOk) {
-      addChatBubble('warning', '⚠️ AI 服务暂未开启，小吏暂以预设内容为君导览。');
-    }
-
+    chatContext = { initialized: true, aiAvailable: true };
     chatHistory.push({ role: 'assistant', content: greeting });
     addChatBubble('assistant', greeting, false, true);
     saveChatToStorage();
+    setChatInputEnabled(!chatBusy);
+
+    checkAiAvailability().then(available => {
+      chatContext.aiAvailable = available;
+      saveChatToStorage();
+    });
   } else {
     setChatInputEnabled(!chatBusy);
   }
@@ -792,8 +824,6 @@ ${historyStr}
   abortController = new AbortController();
 
   try {
-    const aiReady = chatContext?.aiAvailable ?? await checkAiAvailability();
-    if (!aiReady) throw new Error('AI unavailable');
     const res = await chatApi.ask(prompt, abortController.signal);
     if (res.status === 'success' && res.answer) {
       removeLastThinkingBubble();
@@ -808,7 +838,7 @@ ${historyStr}
       return;
     }
     removeLastThinkingBubble();
-    const fallback = 'AI 服务暂未开启，小吏暂时无法作答。\n\n关于"' + text + '"，阁下可在"重点文物"区浏览馆藏精品，或在"研学中心"了解详情。他日AI上线，小吏定当细细道来。';
+    const fallback = '小吏暂时无法作答，请稍后再试。\n\n关于"' + text + '"，阁下可在"重点文物"区浏览馆藏精品，或在"研学中心"了解详情。';
     chatHistory.push({ role: 'assistant', content: fallback });
     addChatBubble('assistant', fallback, false, true);
   }
@@ -819,6 +849,12 @@ ${historyStr}
 // ==================== 页面初始化 ====================
 
 document.addEventListener('DOMContentLoaded', async () => {
+  initImages();
+  // 启动 3D 数字人
+  requestAnimationFrame(() => {
+    const container = document.getElementById('digitalHumanContainer');
+    if (container) initDigitalHuman(container);
+  });
   initNavigation();
   initScrollSpy();
   loadHistoryContent();

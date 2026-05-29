@@ -310,6 +310,7 @@ img { max-width: 100%; height: auto; display: block; }
 }
 #section-relics {
     background: linear-gradient(180deg, transparent 0%, rgba(173,58,47,0.02) 50%, transparent 100%);
+    padding: 80px 20px;
 }
 #section-relics::before {
     content: '';

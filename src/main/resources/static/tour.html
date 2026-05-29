@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登州博物馆 · 云端漫游 | DENGZHOU MUSEUM VR TOUR</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Inter:wght@300;400;500;700&display=swap');
+
+        :root {
+            --gold: #c4a265;
+            --font-display: 'Noto Serif SC', serif;
+            --font-body: 'Inter', 'Noto Sans SC', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-body);
+            background: #000;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #vrFrame {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            z-index: 1;
+        }
+
+        .tour-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            height: 56px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .tour-header > * { pointer-events: auto; }
+
+        .tour-header .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-family: var(--font-display);
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            letter-spacing: 2px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .tour-header .back-btn:hover {
+            background: rgba(196, 162, 101, 0.3);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .tour-header .museum-title {
+            font-family: var(--font-display);
+            font-size: 16px;
+            color: var(--gold);
+            letter-spacing: 4px;
+            font-weight: 700;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+        }
+
+        .hint-text {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.4);
+            font-size: 11px;
+            letter-spacing: 2px;
+            z-index: 10;
+            pointer-events: none;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+        }
+
+        @media (max-width: 768px) {
+            .tour-header .museum-title {
+                font-size: 13px;
+                letter-spacing: 2px;
+            }
+            .hint-text {
+                font-size: 10px;
+                bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <iframe
+        id="vrFrame"
+        src="/uploads/mingren/index.html"
+        allow="autoplay; fullscreen; pointer-lock"
+        allowfullscreen="true">
+    </iframe>
+
+    <header class="tour-header">
+        <button class="back-btn" onclick="goBack()">
+            <span>&larr;</span> 返回首页
+        </button>
+        <span class="museum-title">登州博物馆 &middot; 云端漫游</span>
+        <div></div>
+    </header>
+
+    <div class="hint-text">&#x1f5b1; 鼠标拖拽旋转视角 &nbsp;|&nbsp; W/A/S/D 移动 &nbsp;|&nbsp; 点击画面锁定鼠标</div>
+
+    <script>
+        function goBack() {
+            window.location.href = '/index.html';
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' || e.key === 'Backspace') {
+                e.preventDefault();
+                goBack();
+            }
+        });
+    </script>
+</body>
+</html>
