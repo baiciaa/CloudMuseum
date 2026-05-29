@@ -363,11 +363,13 @@
 /* ==================== 研学中心卡片 ==================== */
 .edu-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 24px;
+    max-width: 640px;
+    margin: 0 auto;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 600px) {
     .edu-grid { grid-template-columns: 1fr; }
 }
 
@@ -756,6 +758,46 @@
 .chat-send-btn:hover {
     background: rgba(196, 162, 101, 0.08);
     box-shadow: 0 0 12px rgba(196, 162, 101, 0.15);
+}
+
+/* ==================== 浮动按钮 - 登州小吏入口 ==================== */
+.float-dengzhou {
+    position: fixed;
+    bottom: 28px; right: 28px;
+    width: 64px; height: 64px;
+    z-index: 1400;
+    cursor: pointer;
+    animation: floatIdle 3s ease-in-out infinite;
+}
+
+@keyframes floatIdle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.float-dengzhou-inner {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(196,162,101,0.15), rgba(196,162,101,0.06));
+    border: 2px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(196,162,101,0.15);
+    backdrop-filter: blur(8px);
+}
+
+.float-dengzhou:hover .float-dengzhou-inner {
+    background: rgba(196,162,101,0.15);
+    box-shadow: 0 6px 28px rgba(196,162,101,0.3);
+    transform: scale(1.08);
+    border-color: var(--gold-light);
+}
+
+.float-dengzhou-icon {
+    font-size: 28px;
+    line-height: 1;
 }
 
 /* ==================== 响应式 ==================== */

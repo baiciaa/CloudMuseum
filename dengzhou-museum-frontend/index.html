@@ -17,7 +17,6 @@
             <li class="nav-item" data-section="tour">旅行攻略 TOUR</li>
             <li class="nav-item" data-section="explore">云端漫游 EXPLORE</li>
             <li class="nav-item" data-section="education">研学中心 EDU</li>
-            <li class="nav-item nav-chat" onclick="window.openTravelChat()">登州小吏 AI</li>
         </ul>
         <div class="nav-footer" style="padding:0 28px; font-size:10px; color:var(--text-secondary);">
             &copy; 2026 DENGZHOU MUSEUM
@@ -232,14 +231,6 @@
                     </p>
                     <button class="btn-primary" style="margin-top:16px;" onclick="window.showReservationModal()">立即预约</button>
                 </div>
-                <div class="card fade-in-up delay-4" style="text-align:center;">
-                    <div class="edu-icon">&#x1f3af;</div>
-                    <div class="card-title">互动学习</div>
-                    <p style="color:var(--text-secondary); font-size:13px;">
-                        3D文物拼图<br>古港知识问答<br>鸳鸯阵虚拟体验
-                    </p>
-                    <button class="btn-primary" style="margin-top:16px;">开始体验</button>
-                </div>
             </div>
         </section>
 
@@ -252,6 +243,13 @@
             登州博物馆<span>|</span>蓬莱 · 烟台<span>|</span>东方海上丝绸之路始发港
         </div>
     </footer>
+
+    <!-- 浮动按钮 - 登州小吏入口（临时替代3D模型） -->
+    <div class="float-dengzhou" onclick="window.openTravelChat()" title="登州小吏">
+        <div class="float-dengzhou-inner">
+            <span class="float-dengzhou-icon">&#x1f3db;</span>
+        </div>
+    </div>
 
     <!-- JS模块引入 -->
     <script type="module" src="/src/main.js"></script>
