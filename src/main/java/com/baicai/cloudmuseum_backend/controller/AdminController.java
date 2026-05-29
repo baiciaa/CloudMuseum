@@ -2,6 +2,7 @@ package com.baicai.cloudmuseum_backend.controller;
 
 import com.baicai.cloudmuseum_backend.config.AdminAuthInterceptor;
 import com.baicai.cloudmuseum_backend.dto.ApiResponse;
+import com.baicai.cloudmuseum_backend.entity.Announcement;
 import com.baicai.cloudmuseum_backend.entity.Article;
 import com.baicai.cloudmuseum_backend.entity.Course;
 import com.baicai.cloudmuseum_backend.service.*;
@@ -81,6 +82,14 @@ public class AdminController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String status) {
         return ApiResponse.ok(articleService.getAll(type, status));
+    }
+
+    /** 管理端资讯列表（含草稿） */
+    @GetMapping("/announcements")
+    public ApiResponse<List<Announcement>> announcements(
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String status) {
+        return ApiResponse.ok(announcementService.getAll(type, status));
     }
 
     /** 管理端课程列表（含已下架） */

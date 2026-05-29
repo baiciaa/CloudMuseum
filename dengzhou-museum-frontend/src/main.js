@@ -486,6 +486,7 @@ window.enterMuseumTour = enterMuseumTour;
 
 // ==================== AI 攻略生成 ====================
 
+import { getUserLocation, fetchWeather, estimateCrowdLevel } from './utils/weather.js';
 import { chatApi } from './api/index.js';
 
 // ==================== 聊天窗状态 ====================
@@ -816,6 +817,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   initScrollSpy();
   loadHistoryContent();
   loadRelics();
+
+  // 加载天气面板
+  const loc = await getUserLocation();
+  const w = await fetchWeather(loc.adcode);
+  if (w) {
+    const locEl = document.getElementById('user-location');
+    if (locEl) locEl.textContent = loc.city;
+    const weatherEl = document.getElementById('weather-info');
+    if (weatherEl) {
+      const today = w.current;
+      weatherEl.innerHTML = `${today.dayweather} ${today.nighttemp}°~${today.daytemp}°`;
+    }
+    const crowdEl = document.getElementById('crowd-info');
+    if (crowdEl) crowdEl.textContent = `预计人流量：${estimateCrowdLevel(new Date().toISOString().split('T')[0])}`;
+  }
 
   // 加载资讯公告
   loadNotices(1, true);

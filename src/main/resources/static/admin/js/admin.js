@@ -186,7 +186,7 @@ const ENTITY_CONFIG = {
     },
     announcements: {
         label: '资讯',
-        listUrl: '/announcements',
+        listUrl: '/admin/announcements',
         createUrl: '/announcements',
         updateUrl: id => `/announcements/${id}`,
         deleteUrl: id => `/announcements/${id}`,
