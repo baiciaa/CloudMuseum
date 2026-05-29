@@ -47,10 +47,15 @@
     font-family: var(--font-display);
     font-size: 13px;
     letter-spacing: 2px;
-    color: var(--text-secondary);
+    color: var(--text-primary);
     transition: all var(--transition-speed);
     position: relative;
     text-transform: uppercase;
+    opacity: 0.75;
+}
+.nav-item:hover,
+.nav-item.active {
+    opacity: 1;
 }
 
 .nav-item:hover,
