@@ -927,15 +927,28 @@ function renderNoticePager(container, page, total, perPage) {
   if (totalPages <= 1) return;
   const pag = document.createElement('div');
   pag.id = 'notice-pagination';
-  pag.style.cssText = 'text-align:center;margin-top:20px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;';
+  pag.className = 'announce-pager';
+  const prv = document.createElement('button');
+  prv.innerHTML = '&#8249; 上一页';
+  prv.className = 'page-btn' + (page <= 1 ? ' disabled' : '');
+  prv.onclick = () => page > 1 && loadNotices(page - 1, true);
+  pag.appendChild(prv);
   for (let p = 1; p <= totalPages; p++) {
     const btn = document.createElement('button');
     btn.textContent = p;
-    btn.className = 'btn btn-sm';
-    if (p === page) { btn.style.background = 'var(--accent)'; btn.style.color = '#fff'; btn.style.borderColor = 'var(--accent)'; }
+    btn.className = 'page-btn' + (p === page ? ' active' : '');
     btn.onclick = () => loadNotices(p, true);
     pag.appendChild(btn);
   }
+  const nxt = document.createElement('button');
+  nxt.innerHTML = '下一页 &#8250;';
+  nxt.className = 'page-btn' + (page >= totalPages ? ' disabled' : '');
+  nxt.onclick = () => page < totalPages && loadNotices(page + 1, true);
+  pag.appendChild(nxt);
+  const info = document.createElement('span');
+  info.className = 'page-info';
+  info.textContent = `共 ${total} 条`;
+  pag.appendChild(info);
   container.after(pag);
 }
 
@@ -946,15 +959,28 @@ function renderEduPager(container, page, total, perPage) {
   if (totalPages <= 1) return;
   const pag = document.createElement('div');
   pag.id = 'edu-pagination';
-  pag.style.cssText = 'text-align:center;margin-top:16px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;';
+  pag.className = 'announce-pager';
+  const prv = document.createElement('button');
+  prv.innerHTML = '&#8249; 上一页';
+  prv.className = 'page-btn' + (page <= 1 ? ' disabled' : '');
+  prv.onclick = () => page > 1 && loadEduNews(page - 1);
+  pag.appendChild(prv);
   for (let p = 1; p <= totalPages; p++) {
     const btn = document.createElement('button');
     btn.textContent = p;
-    btn.className = 'btn btn-sm';
-    if (p === page) { btn.style.background = 'var(--accent)'; btn.style.color = '#fff'; btn.style.borderColor = 'var(--accent)'; }
+    btn.className = 'page-btn' + (p === page ? ' active' : '');
     btn.onclick = () => loadEduNews(p);
     pag.appendChild(btn);
   }
+  const nxt = document.createElement('button');
+  nxt.innerHTML = '下一页 &#8250;';
+  nxt.className = 'page-btn' + (page >= totalPages ? ' disabled' : '');
+  nxt.onclick = () => page < totalPages && loadEduNews(page + 1);
+  pag.appendChild(nxt);
+  const info = document.createElement('span');
+  info.className = 'page-info';
+  info.textContent = `共 ${total} 条`;
+  pag.appendChild(info);
   container.after(pag);
 }
 

@@ -931,6 +931,51 @@
 }
 
 /* ==================== 响应式 ==================== */
+/* ==================== 资讯公告分页 ==================== */
+.announce-pager {
+    text-align: center;
+    margin-top: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.announce-pager .page-btn {
+    min-width: 36px;
+    height: 36px;
+    padding: 0 8px;
+    border: 1px solid var(--border-subtle);
+    background: var(--card-bg);
+    color: var(--text-primary);
+    font-size: 13px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.announce-pager .page-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+}
+.announce-pager .page-btn.active {
+    background: var(--gold);
+    color: #fff;
+    border-color: var(--gold);
+    font-weight: 600;
+}
+.announce-pager .page-btn.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+.announce-pager .page-info {
+    font-size: 12px;
+    color: var(--text-secondary);
+    padding: 0 8px;
+}
+
 @media (max-width: 480px) {
     .form-row { grid-template-columns: 1fr; }
     .modal-panel { padding: 24px; }
