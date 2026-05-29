@@ -448,8 +448,25 @@ window.enterMuseumTour = enterMuseumTour;
 
 // ==================== AI 攻略生成 ====================
 
-import { getUserLocation, fetchWeather, estimateCrowdLevel, getFallbackPlan } from './utils/weather.js';
+import { getUserLocation, fetchWeather, estimateCrowdLevel, getFallbackPlan, getFallbackPlanText } from './utils/weather.js';
 import { travelApi, chatApi } from './api/index.js';
+
+// ==================== 聊天窗状态 ====================
+let chatContext = null;     // { city, weather, crowdLevel }
+let chatHistory = [];       // [{ role, content }]
+let isTyping = false;
+let chatBusy = false;       // AI 回复期间锁定输入
+
+function setChatInputEnabled(enabled) {
+  chatBusy = !enabled;
+  const input = document.getElementById('chat-input');
+  const btn = document.querySelector('.chat-send-btn');
+  if (input) {
+    input.disabled = !enabled;
+    input.placeholder = enabled ? '输入您的问题...' : 'AI 正在回复中...';
+  }
+  if (btn) btn.disabled = !enabled;
+}
 
 window.generateTourPlan = async function() {
   const location = await getUserLocation();
@@ -482,7 +499,7 @@ window.generateTourPlan = async function() {
 
   try {
     const res = await chatApi.ask(prompt);
-    if (res.status === 'success') {
+    if (res.status === 'success' && res.answer) {
       resultContent.innerHTML = res.answer.replace(/\n/g, '<br>');
     } else {
       resultContent.innerHTML = getFallbackPlan(location.city, weather, crowdLevel);
@@ -491,6 +508,186 @@ window.generateTourPlan = async function() {
     resultContent.innerHTML = getFallbackPlan(location.city, weather, crowdLevel);
   }
   resultContainer.scrollIntoView({ behavior: 'smooth' });
+};
+
+// ==================== 旅行攻略聊天窗 ====================
+
+function createChatDialog() {
+  if (document.getElementById('travel-chat-overlay')) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'travel-chat-overlay';
+  overlay.className = 'chat-overlay';
+  overlay.innerHTML = `
+    <div class="chat-panel">
+      <div class="chat-header">
+        <span class="chat-header-title">&#x1f3eF; 登州博物馆 · AI 旅行顾问</span>
+        <button class="chat-close" onclick="window.closeTravelChat()">&times;</button>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <div class="chat-welcome">
+          <p>你好！我是登州博物馆旅行顾问。</p>
+          <p>正在为您分析实时数据...</p>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" class="chat-input" id="chat-input"
+          placeholder="输入您的问题..." onkeydown="if(event.key==='Enter')window.sendChatMessage()">
+        <button class="chat-send-btn" onclick="window.sendChatMessage()">发送</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+window.closeTravelChat = function() {
+  const overlay = document.getElementById('travel-chat-overlay');
+  if (overlay) overlay.remove();
+  chatHistory = [];
+  isTyping = false;
+};
+
+window.openTravelChat = async function() {
+  createChatDialog();
+  const overlay = document.getElementById('travel-chat-overlay');
+  overlay.style.display = 'flex';
+
+  // 首次打开时获取上下文并自动发起攻略请求
+  if (!chatContext) {
+    const location = await getUserLocation();
+    const weather = await fetchWeather(location.adcode);
+    const crowdLevel = estimateCrowdLevel(new Date().toISOString().split('T')[0]);
+    chatContext = { city: location.city, weather, crowdLevel };
+
+    // 更新天气面板
+    const locEl = document.getElementById('user-location');
+    const weatherEl = document.getElementById('weather-info');
+    const crowdEl = document.getElementById('crowd-info');
+    if (locEl) locEl.textContent = location.city;
+    if (weatherEl && weather) {
+      const today = weather.current;
+      weatherEl.innerHTML = `${today.dayweather} ${today.nighttemp}°~${today.daytemp}°`;
+    }
+    if (crowdEl) crowdEl.textContent = `预计人流量：${crowdLevel}`;
+
+    // 清除欢迎消息，自动请求攻略
+    document.getElementById('chat-messages').innerHTML = '';
+    addChatBubble('assistant', '正在为您分析' + location.city + '的实时数据，生成个性化旅游攻略...', true);
+    await requestTravelGuide();
+  }
+};
+
+async function requestTravelGuide() {
+  setChatInputEnabled(false);
+  const ctx = chatContext;
+  const w = ctx.weather?.current;
+  const prompt = `当前条件：所在城市${ctx.city}，天气${w?.dayweather || '未知'}，`
+    + `温度${w?.nighttemp || '?'}°~${w?.daytemp || '?'}°，人流量${ctx.crowdLevel}。`
+    + `请为中小学研学团体生成一份登州博物馆参观攻略，包含：出行建议、参观路线、戚继光文化专线、周边联游。简洁实用，200字以内。`;
+
+  try {
+    const res = await chatApi.ask(prompt);
+    if (res.status === 'success' && res.answer) {
+      removeLastThinkingBubble();
+      chatHistory.push({ role: 'assistant', content: res.answer });
+      addChatBubble('assistant', res.answer, false, true);
+    } else {
+      throw new Error('AI unavailable');
+    }
+  } catch {
+    removeLastThinkingBubble();
+    const fallback = 'AI 服务暂未开启，以下为您提供一份蓬莱博物馆基础游玩攻略：\n\n' + getFallbackPlanText(ctx.city, ctx.weather, ctx.crowdLevel);
+    chatHistory.push({ role: 'assistant', content: fallback });
+    addChatBubble('assistant', fallback, false, true);
+  }
+}
+
+function removeLastThinkingBubble() {
+  const msgs = document.getElementById('chat-messages');
+  const thinking = msgs.querySelector('.chat-thinking');
+  if (thinking) thinking.remove();
+}
+
+function addChatBubble(role, text, isThinking, animate) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'chat-bubble ' + (role === 'user' ? 'chat-user' : 'chat-assistant');
+
+  if (isThinking) {
+    div.classList.add('chat-thinking');
+    div.innerHTML = '<span class="thinking-dots"><span>.</span><span>.</span><span>.</span></span>';
+  } else if (animate) {
+    // 打字机效果
+    div.textContent = '';
+    typewriterEffect(div, text);
+  } else {
+    div.textContent = text;
+  }
+
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function typewriterEffect(el, text) {
+  let i = 0;
+  el.textContent = '';
+  isTyping = true;
+  function tick() {
+    if (i < text.length) {
+      el.textContent += text.charAt(i);
+      i++;
+      const msgs = document.getElementById('chat-messages');
+      msgs.scrollTop = msgs.scrollHeight;
+      setTimeout(tick, 20 + Math.random() * 30);
+    } else {
+      isTyping = false;
+      setChatInputEnabled(true);
+    }
+  }
+  tick();
+}
+
+window.sendChatMessage = async function() {
+  if (chatBusy) return;
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  setChatInputEnabled(false);
+
+  chatHistory.push({ role: 'user', content: text });
+  addChatBubble('user', text);
+
+  // 添加思考动画
+  addChatBubble('assistant', '', true);
+
+  // 构建带历史上下文的 prompt
+  const ctx = chatContext || { city: '烟台', weather: null, crowdLevel: '中' };
+  let historyStr = chatHistory.slice(0, -1).map(m => `${m.role === 'user' ? '用户' : 'AI'}: ${m.content}`).join('\n');
+  const prompt = `你是一位登州博物馆旅行顾问。登州博物馆在山东蓬莱，戚继光故乡，东方海上丝绸之路始发港。
+开放时间：夏季9:00-18:00，冬季9:00-17:00，周一闭馆，免费参观。
+当前用户所在城市：${ctx.city}。
+
+对话历史：
+${historyStr}
+
+用户最新问题：${text}
+
+请简洁回复（200字以内）。`;
+
+  try {
+    const res = await chatApi.ask(prompt);
+    if (res.status === 'success' && res.answer) {
+      removeLastThinkingBubble();
+      chatHistory.push({ role: 'assistant', content: res.answer });
+      addChatBubble('assistant', res.answer, false, true);
+    } else {
+      throw new Error('AI unavailable');
+    }
+  } catch {
+    removeLastThinkingBubble();
+    const fallback = 'AI 服务暂未开启。\n\n关于"' + text + '"，建议您参考博物馆提供的研学课程和参观攻略。如需详细帮助，请关注「烟台市蓬莱区登州博物馆」微信公众号获取最新信息。';
+    chatHistory.push({ role: 'assistant', content: fallback });
+    addChatBubble('assistant', fallback, false, true);
+  }
 };
 
 // ==================== 页面初始化 ====================
