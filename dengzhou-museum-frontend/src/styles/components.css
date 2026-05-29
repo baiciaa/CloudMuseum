@@ -6,7 +6,7 @@
     height: 100vh;
     background: rgba(253, 250, 245, 0.97);
     backdrop-filter: blur(12px);
-    border-right: 1px solid var(--border-subtle);
+    border-right: none;
     z-index: 1000;
     display: flex;
     flex-direction: column;
@@ -76,11 +76,36 @@
     box-shadow: 0 0 10px rgba(196, 162, 101, 0.5);
 }
 
+/* ==================== 金边红木柱系统 ==================== */
+/* 左侧：红柱分隔线 (导航与内容之间) */
+.side-nav::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: calc(var(--nav-width) - 12px);
+    width: 14px;
+    height: 100vh;
+    z-index: 999;
+    pointer-events: none;
+    background:
+        linear-gradient(90deg,
+            var(--pillar-red-dark) 0%,
+            var(--pillar-red) 15%,
+            var(--pillar-red-light) 40%,
+            var(--pillar-red) 70%,
+            var(--pillar-red-dark) 100%
+        );
+    border-right: 3px solid var(--gold-trim);
+    box-shadow:
+        4px 0 12px rgba(138,37,21,0.12),
+        inset -1px 0 0 rgba(212,170,64,0.2);
+}
+
+
 /* ==================== 主内容区 ==================== */
 .main-content {
-    margin-left: var(--nav-width);
+    margin-left: calc(var(--nav-width) - 12px + 14px);
     padding: 0 40px;
-    overflow-x: hidden;
     min-width: 0;
 }
 
@@ -103,38 +128,48 @@
     transition: all var(--transition-speed);
     position: relative;
     overflow: hidden;
+    /* 玻璃拟态基础 */
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
 }
 
-/* 卡片角标装饰 */
-.card::before {
-    content: '';
-    position: absolute;
-    top: 0; right: 0;
-    width: 24px; height: 24px;
-    border-left: 1px solid var(--border-subtle);
-    border-bottom: 1px solid var(--border-subtle);
-    opacity: 0;
-    transition: opacity 0.3s;
-}
+/* 卡片角标装饰 — 传统回纹风格 */
+.card::before,
 .card::after {
     content: '';
     position: absolute;
-    bottom: 0; left: 0;
-    width: 24px; height: 24px;
-    border-right: 1px solid var(--border-subtle);
-    border-top: 1px solid var(--border-subtle);
+    width: 28px; height: 28px;
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity 0.4s ease, transform 0.4s ease;
 }
-.card:hover::before,
+.card::before {
+    top: 6px; right: 6px;
+    border-top: 2px solid var(--gold);
+    border-right: 2px solid var(--gold);
+    transform: translate(2px, -2px);
+}
+.card::after {
+    bottom: 6px; left: 6px;
+    border-bottom: 2px solid var(--gold);
+    border-left: 2px solid var(--gold);
+    transform: translate(-2px, 2px);
+}
+.card:hover::before {
+    opacity: 0.5;
+    transform: translate(0, 0);
+}
 .card:hover::after {
-    opacity: 1;
+    opacity: 0.5;
+    transform: translate(0, 0);
 }
 
 .card:hover {
     border-color: var(--border-glow);
     transform: translateY(-4px);
-    box-shadow: 0 12px 32px rgba(196, 162, 101, 0.1);
+    box-shadow:
+        0 12px 32px rgba(196, 162, 101, 0.1),
+        inset 0 0 0 0.5px rgba(196, 162, 101, 0.1);
+    background: rgba(196, 162, 101, 0.06);
 }
 
 .card-title {
@@ -150,23 +185,27 @@
 /* ==================== 按钮组件 ==================== */
 .btn-primary {
     display: inline-block;
-    padding: 12px 32px;
-    background: transparent;
-    border: 1px solid var(--gold);
-    color: var(--gold);
+    padding: 12px 40px;
+    background: rgba(42, 31, 31, 0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #fff;
     font-family: var(--font-display);
-    font-size: 13px;
-    letter-spacing: 2px;
+    font-size: 14px;
+    letter-spacing: 3px;
     cursor: pointer;
     transition: all var(--transition-speed);
     position: relative;
     overflow: hidden;
-    font-weight: 600;
+    font-weight: 500;
+    border-radius: 4px;
 }
 
 .btn-primary:hover {
-    background: rgba(196, 162, 101, 0.08);
-    box-shadow: 0 0 20px rgba(196, 162, 101, 0.25);
+    background: rgba(42, 31, 31, 0.7);
+    border-color: rgba(255, 255, 255, 0.45);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
     transform: translateY(-1px);
 }
 
@@ -175,7 +214,7 @@
     position: absolute;
     top: 0; left: -100%;
     width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(196, 162, 101, 0.15), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
     transition: left 0.5s;
 }
 .btn-primary:hover::before { left: 100%; }
@@ -223,21 +262,52 @@
 
 .relic-card .card-img {
     width: 100%;
-    height: 220px;
+    height: 260px; /* 更高 */
     background: linear-gradient(135deg, #f5efe0 0%, #e8dcc8 100%);
     position: relative;
     overflow: hidden;
     border-bottom: 1px solid var(--border-subtle);
 }
 
+.relic-card .card-img::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 60%, rgba(42,31,31,0.3) 100%);
+    opacity: 0;
+    transition: opacity 0.4s;
+    z-index: 1;
+    pointer-events: none;
+}
+.relic-card:hover .card-img::before {
+    opacity: 1;
+}
+
 .relic-card .card-img img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
+    transition: transform 0.6s ease, filter 0.4s ease;
 }
 .relic-card:hover .card-img img {
-    transform: scale(1.08);
+    transform: scale(1.1);
+}
+
+/* 文物名上浮 — hover 时显示在图片底部 */
+.relic-card .card-img .img-label {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 12px 16px;
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 1px;
+    transform: translateY(100%);
+    transition: transform 0.4s ease;
+    z-index: 2;
+}
+.relic-card:hover .card-img .img-label {
+    transform: translateY(0);
 }
 
 /* 骨架屏 */
@@ -299,6 +369,18 @@
     .tour-panels { grid-template-columns: repeat(2, 1fr); }
 }
 
+.tour-panels .card {
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    background: rgba(253,250,245,0.6);
+    border-color: rgba(91,160,184,0.15);
+}
+.tour-panels .card:hover {
+    background: rgba(91,160,184,0.06);
+    border-color: rgba(91,160,184,0.3);
+    box-shadow: 0 12px 32px rgba(91,160,184,0.08);
+}
+
 .tour-card-icon {
     font-size: 36px;
     margin-bottom: 8px;
@@ -327,16 +409,26 @@
     width: 100%;
     height: 280px;
     background: linear-gradient(135deg, #f5efe0 0%, #e0d5bc 50%, #d4c8a8 100%);
+    background-size: cover;
+    background-position: center;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
+    transition: transform 0.6s ease;
+}
+.tour-entrance:hover .tour-entrance-bg {
+    transform: scale(1.02);
 }
 .tour-entrance-bg::before {
     content: '';
     position: absolute;
     inset: 0;
     background: radial-gradient(ellipse at center, rgba(196,162,101,0.08) 0%, transparent 60%);
+}
+/* 有背景图时的深色遮罩层 */
+.tour-entrance-bg.has-image::before {
+    background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.4) 100%);
 }
 
 .tour-entrance-icon {
@@ -760,14 +852,28 @@
     box-shadow: 0 0 12px rgba(196, 162, 101, 0.15);
 }
 
-/* ==================== 浮动按钮 - 登州小吏入口 ==================== */
+/* ==================== 浮动按钮 - 3D 数字人入口 ==================== */
 .float-dengzhou {
     position: fixed;
-    bottom: 100px; right: 28px;
-    width: 64px; height: 64px;
+    bottom: 100px; right: 20px;
+    width: 220px;
+    height: 220px;
     z-index: 1600;
     cursor: pointer;
     animation: floatIdle 3s ease-in-out infinite;
+    transition: all 0.4s cubic-bezier(.4,0,.2,1);
+}
+.float-dengzhou.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(40px);
+}
+/* 聊天窗打开时，数字人移到对话框左侧 */
+.float-dengzhou.chat-open {
+    right: calc(420px + 24px);
+    left: auto;
+    bottom: 100px;
+    transform: scale(0.85);
 }
 
 @keyframes floatIdle {
@@ -778,26 +884,53 @@
 .float-dengzhou-inner {
     width: 100%; height: 100%;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(196,162,101,0.15), rgba(196,162,101,0.06));
-    border: 2px solid var(--gold);
+    background: transparent;
+    border: none;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 16px rgba(196,162,101,0.15);
-    backdrop-filter: blur(8px);
+    filter: drop-shadow(0 4px 12px rgba(196,162,101,0.15));
+    position: relative;
+    overflow: visible;
+}
+/* 3D canvas 填满容器 */
+.float-dengzhou-inner canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
 }
 
 .float-dengzhou:hover .float-dengzhou-inner {
-    background: rgba(196,162,101,0.15);
-    box-shadow: 0 6px 28px rgba(196,162,101,0.3);
-    transform: scale(1.08);
-    border-color: var(--gold-light);
+    filter: drop-shadow(0 6px 28px rgba(196,162,101,0.35));
+    transform: scale(1.06);
 }
 
+/* 加载中图标(模型加载前显示) */
 .float-dengzhou-icon {
-    font-size: 28px;
+    font-size: 36px;
     line-height: 1;
+    position: absolute;
+    z-index: 1;
+    transition: opacity 0.4s;
+    pointer-events: none;
+}
+/* 模型加载完成后隐藏图标 */
+#digitalHumanContainer.model-loaded .float-dengzhou-icon {
+    opacity: 0;
+}
+#digitalHumanContainer.model-failed .float-dengzhou-icon {
+    opacity: 1;
+    color: var(--red-accent);
+}
+
+/* 加载中动画 */
+#digitalHumanContainer:not(.model-loaded):not(.model-failed) .float-dengzhou-icon {
+    animation: loadPulse 1.5s ease-in-out infinite;
+}
+@keyframes loadPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.9); }
 }
 
 /* ==================== 响应式 ==================== */
