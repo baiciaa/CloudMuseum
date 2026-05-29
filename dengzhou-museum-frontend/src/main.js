@@ -486,8 +486,8 @@ window.enterMuseumTour = enterMuseumTour;
 
 // ==================== AI 攻略生成 ====================
 
-import { getUserLocation, fetchWeather, estimateCrowdLevel, getFallbackPlan } from './utils/weather.js';
-import { travelApi, chatApi } from './api/index.js';
+import { getUserLocation, fetchWeather, estimateCrowdLevel } from './utils/weather.js';
+import { chatApi } from './api/index.js';
 
 // ==================== 聊天窗状态 ====================
 const CHAT_STORAGE_KEY = 'dengzhou_chat_history';
@@ -553,48 +553,6 @@ function setChatInputEnabled(enabled) {
   }
   if (btn) btn.disabled = !enabled;
 }
-
-window.generateTourPlan = async function() {
-  const location = await getUserLocation();
-  const weather = await fetchWeather(location.adcode);
-  const crowdLevel = estimateCrowdLevel(new Date().toISOString().split('T')[0]);
-
-  // 更新 UI
-  document.getElementById('user-location').textContent = location.city;
-  if (weather) {
-    const today = weather.current;
-    document.getElementById('weather-info').innerHTML =
-      `${today.dayweather} ${today.nighttemp}°~${today.daytemp}°<br><small>${today.winddir}风 ${today.windpower}级</small>`;
-  }
-  document.getElementById('crowd-info').textContent = `预计人流量：${crowdLevel}`;
-
-  const prompt = `请为以下条件生成一份登州博物馆研学旅行攻略：
-- 用户所在城市：${location.city}
-- 今日天气：${weather?.current?.dayweather}, 温度${weather?.current?.nighttemp}°~${weather?.current?.daytemp}°
-- 预计人流量：${crowdLevel}
-- 目标受众：中小学研学团体
-- 博物馆开放时间：5-10月9:00-18:00（17:30停止入馆），11-4月9:00-17:00（16:30停止入馆），每周一闭馆
-- 门票：免费（凭身份证入馆）
-- 特色：登州是戚继光故乡，博物馆有戚继光专题展区
-
-请包含：出行建议、参观路线、重点展厅推荐（含戚继光展区）、研学活动建议、周边景点联游（含戚继光故里）。`;
-
-  const resultContainer = document.getElementById('ai-result');
-  const resultContent = document.getElementById('ai-result-content');
-  resultContainer.style.display = 'block';
-
-  try {
-    const res = await chatApi.ask(prompt);
-    if (res.status === 'success' && res.answer) {
-      resultContent.innerHTML = res.answer.replace(/\n/g, '<br>');
-    } else {
-      resultContent.innerHTML = getFallbackPlan(location.city, weather, crowdLevel);
-    }
-  } catch {
-    resultContent.innerHTML = getFallbackPlan(location.city, weather, crowdLevel);
-  }
-  resultContainer.scrollIntoView({ behavior: 'smooth' });
-};
 
 // ==================== 旅行攻略聊天窗 ====================
 
