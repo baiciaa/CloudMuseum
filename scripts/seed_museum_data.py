@@ -391,7 +391,7 @@ def main():
             "蓬莱是抗倭英雄戚继光的故乡，戚继光深受精忠报国精神感召，"
             "以「封侯非我意，但愿海波平」明志，这份家国情怀与碑刻所承载的精神一脉相承。",
             "南宋", "碑刻拓片",
-            "/uploads/images/relics/huanwoheshan.jpg",
+            "/uploads/images/relics/nian-wu-zhong-qi-shu-fa-li-zhou.jpg",
             None, None
         ),
         (
@@ -402,7 +402,7 @@ def main():
             "蓬莱是戚继光的故乡，戚氏家族世袭登州卫指挥佥事，"
             "戚继光17岁袭父职，正是在这种精忠报国精神的熏陶下成长为一代抗倭名将。",
             "明代", "青铜器",
-            "/uploads/images/relics/yuefei-bronze.jpg",
+            "/uploads/images/relics/ming-qing-guan-yin-tong-xiang.jpg",
             None, None
         ),
         (
@@ -413,7 +413,7 @@ def main():
             "登州千年的武术传统，在此创立鸳鸯阵、训练戚家军，"
             "将登州武术融入实战兵法，成就了抗倭伟业。",
             "清代", "古籍善本",
-            "/uploads/images/relics/yuejiaquan-book.jpg",
+            "/uploads/images/relics/qing-guang-xu-shi-ba-nian-nan-hai-li-shi-fan-bao-ke-ben-tai-.jpg",
             None, None
         ),
         (
@@ -424,7 +424,7 @@ def main():
             "蓬莱是戚继光的故里，戚继光继承并发扬了登州千年海防传统，"
             "在蓬莱水城练兵备战，将这座军港打造为北方最坚固的海防堡垒。",
             "南宋", "钱币",
-            "/uploads/images/relics/jianyan-coin.jpg",
+            "/uploads/images/relics/bei-song-tong-qian-yang-ban.jpg",
             None, None
         ),
         (
@@ -435,7 +435,7 @@ def main():
             "蓬莱是戚继光的故乡，宋代的登州海防传统为戚继光日后创建戚家军、"
             "改革军制提供了深厚的历史积淀，这件铁胄正是登州千年武备史的实物见证。",
             "宋代", "兵器",
-            "/uploads/images/relics/song-helmet.jpg",
+            "/uploads/images/relics/ming-tie-mao.jpg",
             None, None
         ),
         (
@@ -447,7 +447,7 @@ def main():
             "忠君报国、保家卫国的家国情怀。戚继光的「封侯非我意，但愿海波平」"
             "与此匾精神一脉相承，共同铸就了蓬莱的精忠文化传统。",
             "明代", "匾额",
-            "/uploads/images/relics/jingzhong-plaque.jpg",
+            "/uploads/images/relics/ming-tian-qi-si-nian-jia-zi-zhong-xia-deng-shu-zhong-lou-gua.jpg",
             None, None
         ),
         # ---- 登州本地文物（保留原有核心藏品） ----
@@ -457,7 +457,7 @@ def main():
             "「汉廿八将佐命功苗东藩琴亭国李夫人灵第之门」。距今近两千年，"
             "鹿形姿态安详，线条流畅，是汉代画像石中的精品，登州博物馆镇馆之宝。",
             "东汉", "石刻",
-            "/uploads/images/relics/han-deer-stone.jpg",
+            "/uploads/images/relics/dong-han-hua-xiang-ke-shi.jpg",
             None, None
         ),
         (
@@ -466,7 +466,7 @@ def main():
             "洪武八年二月日宝源局造」等字样，全长38.5厘米，重12.6公斤。"
             "此炮是铜火铳向铜炮演变的最早实物例证，对研究中国古代火器发展史具有重要价值。",
             "明代", "青铜器",
-            "/uploads/images/relics/ming-cannon.jpg",
+            "/uploads/images/relics/ming-hong-wu-ba-nian-zhu-qing-tong-wan-kou-pao.jpg",
             None, None
         ),
         (
@@ -475,7 +475,7 @@ def main():
             "外部镶嵌千尊小造像，每尊高约3厘米，姿态各异，工艺精湛。"
             "台座底部刻有唐代天宝年间造像铭文，体现了唐代佛教艺术的辉煌成就。",
             "唐代", "青铜器",
-            "/uploads/images/relics/qianfo-platform.jpg",
+            "/uploads/images/relics/xi-zhou-shou-mian-wen-tong-ding.jpg",
             None, None
         ),
         (
@@ -484,7 +484,7 @@ def main():
             "造型优美。蓬莱水城小海清淤出土，是宋代耀州窑刻花瓷器的代表作。"
             "此壶为当时登州港对外出口的外销瓷品种之一。",
             "宋代", "瓷器",
-            "/uploads/images/relics/yaozhou-ewer.jpg",
+            "/uploads/images/relics/song-yao-zhou-yao-ke-mu-dan-wen-zhi-hu.jpg",
             None, None
         ),
         (
@@ -493,7 +493,7 @@ def main():
             "壶腹贴椰枣纹模印贴花。蓬莱水城小海清淤出土，见证了大唐海上丝绸之路"
             "的繁荣与东西方文化交流。",
             "唐代", "瓷器",
-            "/uploads/images/relics/changsha-ewer.jpg",
+            "/uploads/images/relics/tang-chang-sha-yao-huang-you-he-cai-tie-hua-zhi-hu.jpg",
             None, None
         ),
         (
@@ -502,7 +502,7 @@ def main():
             "粉彩色泽温润，画工细腻，桃枝苍劲，桃实丰腴，蝙蝠飞舞其间，"
             "是清代官窑瓷器中的上佳之作。",
             "清代", "瓷器",
-            "/uploads/images/relics/peach-vase.jpg",
+            "/uploads/images/relics/qing-qing-hua-you-li-hong-chan-zhi-mu-dan-wen-zun.jpg",
             None, None
         ),
         (
@@ -512,7 +512,7 @@ def main():
             "此类铁炮是明代登州海防体系的重要组成部分，"
             "见证了登州作为「外捍朝辽、内障中原」军事重镇的历史地位。",
             "明代", "兵器",
-            "/uploads/images/relics/dengzhou-cannon.jpg",
+            "/uploads/images/relics/ming-tie-pao.jpg",
             None, None
         ),
         (
@@ -522,7 +522,7 @@ def main():
             "是高丽青瓷通过海上丝绸之路输入中国的重要物证，"
             "印证了登州港与朝鲜半岛悠久的贸易往来。",
             "高丽时期", "瓷器",
-            "/uploads/images/relics/goryeo-bowl.jpg",
+            "/uploads/images/relics/song-ying-qing-bo.jpg",
             None, None
         ),
         (
@@ -532,7 +532,7 @@ def main():
             "图上标注了登州府城、蓬莱水城、长山岛等军事要地，"
             "是研究清代北方海防体系的珍贵地图文献。",
             "清代", "字画",
-            "/uploads/images/relics/navy-map.jpg",
+            "/uploads/images/relics/nian-yu-jian-hua-peng-lai-ge-tu-zhou.jpg",
             None, None
         ),
         (
@@ -542,7 +542,7 @@ def main():
             "此戈是登州地区迄今发现最早的青铜兵器之一，"
             "证明早在三千年前，这片土地上已有完善的武备体系。",
             "西周", "青铜器",
-            "/uploads/images/relics/zhou-dagger-axe.jpg",
+            "/uploads/images/relics/dong-zhou-tong-ge.jpg",
             None, None
         ),
         (
@@ -552,29 +552,58 @@ def main():
             "此类陶船明器在登州地区汉墓中多次出土，"
             "反映了汉代登州先民已具备成熟的造船技术和远航能力。",
             "汉代", "陶器",
-            "/uploads/images/relics/han-ship-model.jpg",
+            "/uploads/images/relics/han-sheng-wen-tao-guan.jpg",
             None, None
         ),
     ]
 
     print(f"\n插入 {len(relics)} 件文物...")
+    inserted_names = set()
     for name, desc, era, category, image_url, model_url, external_link in relics:
         cursor.execute(
             "INSERT INTO relics (name, description, era, category, image_url, model_url, external_link) "
             "VALUES (%s, %s, %s, %s, %s, %s, %s)",
             (name, desc, era, category, image_url, model_url, external_link),
         )
+        inserted_names.add(name)
         print(f"  [{era}·{category}] {name[:25]}... -> OK")
+
+    # 导入 scraped_data.json 的 106 件文物
+    try:
+        with open("scraped_data.json", "r", encoding="utf-8") as f:
+            scraped = json.load(f)
+    except FileNotFoundError:
+        scraped = []
+
+    scraped_count = 0
+    for item in scraped:
+        name = item.get("name", "")
+        if name in inserted_names:
+            continue
+        desc = item.get("description", "")
+        era = item.get("era", "")
+        category = item.get("category", "").replace("、", "·")
+        image_url = item.get("image_local", "")
+        cursor.execute(
+            "INSERT INTO relics (name, description, era, category, image_url, model_url, external_link) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s)",
+            (name, desc, era, category, image_url, None, None),
+        )
+        inserted_names.add(name)
+        scraped_count += 1
+        if scraped_count % 20 == 0:
+            print(f"  ... 已导入 {scraped_count} 件")
 
     conn.commit()
 
     cursor.close()
     conn.close()
 
+    total_relics = len(relics) + scraped_count
     print(f"\n===== 完成 =====")
     print(f"Articles: {len(articles)} 篇")
     print(f"Courses: {len(courses)} 门")
-    print(f"Relics: {len(relics)} 件")
+    print(f"Relics: {total_relics} 件 (手编 {len(relics)} + 导入 {scraped_count})")
 
 
 if __name__ == "__main__":

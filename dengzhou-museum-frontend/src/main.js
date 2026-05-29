@@ -4,7 +4,7 @@
 import './styles/style.css';
 import './styles/components.css';
 import './styles/animations.css';
-import { articleApi, relicApi } from './api/index.js';
+import { articleApi, relicApi, courseApi, reservationApi } from './api/index.js';
 
 // ==================== 导航系统 ====================
 
@@ -267,6 +267,174 @@ window.showRelicDetail = async function(id) {
       <div style="line-height:1.8; color:var(--text-primary);">${relic.description || '暂无详细描述'}</div>
     </div>
   `;
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+};
+
+// ==================== 研学中心：课程弹窗 ====================
+
+window.showCoursesModal = async function() {
+  const result = await courseApi.list('ACTIVE');
+  const courses = result?.data || [];
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-panel modal-lg">
+      <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+      <h2 class="modal-title">研学课程</h2>
+      <div class="course-list">
+        ${courses.length === 0
+          ? '<p style="color:var(--text-secondary);text-align:center;">暂无可用课程</p>'
+          : courses.map(c => `
+            <div class="course-item" onclick="window.showCourseDetail(${c.id})">
+              <div class="course-item-header">
+                <h3>${c.title}</h3>
+                <span class="course-price">${c.price > 0 ? '¥' + c.price + '/人' : '免费'}</span>
+              </div>
+              <p class="course-item-desc">${c.description || ''}</p>
+              <div class="course-item-meta">
+                <span>&#x1f4c5; ${parseSchedule(c.scheduleInfo)}</span>
+                <span>&#x1f465; 已约${c.currentReserved || 0}/${c.maxCapacity || 0}人</span>
+              </div>
+            </div>
+          `).join('')}
+      </div>
+    </div>`;
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+};
+
+window.showCourseDetail = async function(id) {
+  const result = await courseApi.getById(id);
+  const c = result?.data;
+  if (!c) return;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-panel">
+      <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+      <h2 class="modal-title">${c.title}</h2>
+      <div class="course-detail">
+        <div class="course-detail-meta">
+          <span class="course-tag">${c.price > 0 ? '¥' + c.price + '/人' : '免费课程'}</span>
+          <span class="course-tag">已约${c.currentReserved || 0}/${c.maxCapacity || 0}人</span>
+        </div>
+        <div class="course-detail-schedule">${parseSchedule(c.scheduleInfo)}</div>
+        <div class="course-detail-body">${(c.content || c.description || '').replace(/\\n/g, '<br>')}</div>
+      </div>
+      <button class="btn-primary" style="margin-top:24px;width:100%;"
+        onclick="this.closest('.modal-overlay').remove();window.showReservationModal(${c.id})">
+        立即预约此课程
+      </button>
+    </div>`;
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+};
+
+function parseSchedule(scheduleJson) {
+  try {
+    const arr = JSON.parse(scheduleJson);
+    if (Array.isArray(arr) && arr.length > 0) {
+      return arr.map(s => `${s.date} ${s.time} @ ${s.location}`).join(' | ');
+    }
+    return scheduleJson || '排期待定';
+  } catch {
+    return scheduleJson || '排期待定';
+  }
+}
+
+// ==================== 研学中心：预约弹窗 ====================
+
+window.showReservationModal = function(courseId) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-panel">
+      <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+      <h2 class="modal-title">团体参观预约</h2>
+      <form class="reserve-form" onsubmit="window.submitReservation(event, ${courseId || 'null'})">
+        <div class="form-group">
+          <label>联系人姓名 *</label>
+          <input type="text" name="contactName" required placeholder="请输入联系人姓名">
+        </div>
+        <div class="form-group">
+          <label>联系电话 *</label>
+          <input type="tel" name="contactPhone" required placeholder="请输入手机号码">
+        </div>
+        <div class="form-group">
+          <label>学校/单位名称</label>
+          <input type="text" name="organization" placeholder="请输入学校或单位名称">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>参观人数 *</label>
+            <input type="number" name="visitorCount" required min="10" max="200" value="30" placeholder="10-200人">
+          </div>
+          <div class="form-group">
+            <label>预计日期</label>
+            <input type="date" name="visitDate">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>备注</label>
+          <textarea name="notes" rows="2" placeholder="如有特殊需求请注明"></textarea>
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%;margin-top:8px;">提交预约</button>
+      </form>
+      <p style="color:var(--text-secondary);font-size:11px;text-align:center;margin-top:12px;">
+        提交后工作人员将在1-2个工作日内与您联系确认
+      </p>
+    </div>`;
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+};
+
+window.submitReservation = async function(event, courseId) {
+  event.preventDefault();
+  const form = event.target;
+  const data = {
+    userId: 1,
+    type: 'GROUP',
+    courseId: courseId || null,
+    contactName: form.contactName.value.trim(),
+    contactPhone: form.contactPhone.value.trim(),
+    visitorCount: parseInt(form.visitorCount.value) || 30,
+    visitDate: form.visitDate.value || new Date().toISOString().split('T')[0],
+    remarks: (form.organization.value.trim() ? '单位：' + form.organization.value.trim() + '。' : '') + form.notes.value.trim(),
+  };
+
+  if (!data.contactName || !data.contactPhone) {
+    alert('请填写联系人姓名和电话');
+    return;
+  }
+
+  try {
+    const res = await reservationApi.create(data);
+    if (res.success || res.status === 'success' || res.code === 200) {
+      form.closest('.modal-overlay').remove();
+      window.showReservationSuccess();
+    } else {
+      alert('预约提交失败：' + (res.message || '请稍后重试'));
+    }
+  } catch (err) {
+    alert('网络错误，请稍后重试');
+  }
+};
+
+window.showReservationSuccess = function() {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-panel" style="text-align:center;">
+      <div style="font-size:56px;margin-bottom:16px;">&#x2705;</div>
+      <h2 class="modal-title">预约已提交</h2>
+      <p style="color:var(--text-secondary);margin:16px 0;line-height:1.8;">
+        感谢您的预约！<br>工作人员将在1-2个工作日内与您联系确认。
+      </p>
+      <button class="btn-primary" onclick="this.closest('.modal-overlay').remove()">关闭</button>
+    </div>`;
   overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
   document.body.appendChild(overlay);
 };
