@@ -463,6 +463,7 @@ let chatContext = null;     // { initialized, aiAvailable }
 let chatHistory = [];       // [{ role, content }]
 let isTyping = false;
 let chatBusy = false;       // AI 回复期间锁定输入
+let chatOpening = false;    // 防止重复打开
 let aiCheckCache = { timestamp: 0, available: false };
 
 async function checkAiAvailability() {
@@ -600,6 +601,7 @@ window.closeTravelChat = function() {
   chatContext = null;
   chatHistory = [];
   isTyping = false;
+  chatOpening = false;
 };
 
 window.clearChatHistory = function() {
@@ -614,6 +616,7 @@ window.clearChatHistory = function() {
 };
 
 window.toggleDengzhouChat = function() {
+  if (chatOpening) return;
   const overlay = document.getElementById('travel-chat-overlay');
   if (overlay && overlay.style.display === 'flex') {
     window.closeTravelChat();
@@ -623,6 +626,8 @@ window.toggleDengzhouChat = function() {
 };
 
 window.openTravelChat = async function() {
+  if (chatOpening) return;
+  chatOpening = true;
   createChatDialog();
   const overlay = document.getElementById('travel-chat-overlay');
   overlay.style.display = 'flex';
@@ -638,10 +643,11 @@ window.openTravelChat = async function() {
       chatHistory.forEach(m => addChatBubble(m.role, m.content, false, false));
       // 快速检测 AI 状态（带缓存）
       chatContext.aiAvailable = await checkAiAvailability();
-      if (!chatContext.aiAvailable) {
+      if (!chatContext.aiAvailable && !document.querySelector('.chat-warning')) {
         addChatBubble('warning', '⚠️ AI 服务暂未开启，浏览历史记录中。');
       }
       saveChatToStorage();
+      chatOpening = false;
       return;
     }
 
@@ -662,6 +668,7 @@ window.openTravelChat = async function() {
     addChatBubble('assistant', greeting, false, true);
     saveChatToStorage();
   }
+  chatOpening = false;
 };
 
 function removeLastThinkingBubble() {
