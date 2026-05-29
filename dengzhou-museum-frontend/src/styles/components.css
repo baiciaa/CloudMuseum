@@ -632,6 +632,22 @@
     color: var(--red-accent);
 }
 
+.chat-clear-btn {
+    background: none;
+    border: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+    font-size: 11px;
+    cursor: pointer;
+    padding: 4px 10px;
+    letter-spacing: 1px;
+    font-family: var(--font-display);
+    transition: all var(--transition-speed);
+}
+.chat-clear-btn:hover {
+    border-color: var(--red-accent);
+    color: var(--red-accent);
+}
+
 .chat-messages {
     flex: 1;
     overflow-y: auto;

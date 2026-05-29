@@ -457,10 +457,39 @@ import { getUserLocation, fetchWeather, estimateCrowdLevel, getFallbackPlan } fr
 import { travelApi, chatApi } from './api/index.js';
 
 // ==================== 聊天窗状态 ====================
-let chatContext = null;     // { city, weather, crowdLevel }
+const CHAT_STORAGE_KEY = 'dengzhou_chat_history';
+let chatContext = null;     // { initialized, aiAvailable }
 let chatHistory = [];       // [{ role, content }]
 let isTyping = false;
 let chatBusy = false;       // AI 回复期间锁定输入
+
+function saveChatToStorage() {
+  try {
+    const data = { context: chatContext, history: chatHistory };
+    localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(data));
+    const btn = document.getElementById('chat-clear-btn');
+    if (btn) btn.style.display = 'inline-block';
+  } catch { /* storage full, ignore */ }
+}
+
+function loadChatFromStorage() {
+  try {
+    const raw = localStorage.getItem(CHAT_STORAGE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data.history && data.history.length > 0) {
+        return data;
+      }
+    }
+  } catch { /* corrupted, ignore */ }
+  return null;
+}
+
+function clearChatStorage() {
+  localStorage.removeItem(CHAT_STORAGE_KEY);
+  const btn = document.getElementById('chat-clear-btn');
+  if (btn) btn.style.display = 'none';
+}
 
 function setChatInputEnabled(enabled) {
   chatBusy = !enabled;
@@ -526,7 +555,11 @@ function createChatDialog() {
     <div class="chat-panel">
       <div class="chat-header">
         <span class="chat-header-title">&#x1f3eF; 登州小吏</span>
-        <button class="chat-close" onclick="window.closeTravelChat()">&times;</button>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button id="chat-clear-btn" class="chat-clear-btn" title="清空历史记录"
+            style="display:none;" onclick="window.clearChatHistory()">清空</button>
+          <button class="chat-close" onclick="window.closeTravelChat()">&times;</button>
+        </div>
       </div>
       <div class="chat-messages" id="chat-messages">
         <div class="chat-welcome">
@@ -544,11 +577,23 @@ function createChatDialog() {
 }
 
 window.closeTravelChat = function() {
+  saveChatToStorage();
   const overlay = document.getElementById('travel-chat-overlay');
   if (overlay) overlay.remove();
   chatContext = null;
   chatHistory = [];
   isTyping = false;
+};
+
+window.clearChatHistory = function() {
+  chatHistory = [];
+  chatContext = null;
+  clearChatStorage();
+  document.getElementById('chat-messages').innerHTML = '';
+  chatBusy = false;
+  setChatInputEnabled(true);
+  // 触发重新初始化
+  window.openTravelChat();
 };
 
 window.openTravelChat = async function() {
@@ -557,9 +602,25 @@ window.openTravelChat = async function() {
   overlay.style.display = 'flex';
 
   if (!chatContext) {
-    chatContext = { initialized: true, aiAvailable: false };
-    chatHistory = [];
-    document.getElementById('chat-messages').innerHTML = '';
+    // 尝试从 localStorage 恢复历史记录
+    const saved = loadChatFromStorage();
+    if (saved) {
+      chatContext = saved.context || { initialized: true, aiAvailable: false };
+      chatHistory = saved.history;
+      document.getElementById('chat-messages').innerHTML = '';
+      // 渲染历史消息（不带动画）
+      chatHistory.forEach(m => addChatBubble(m.role, m.content, false, false));
+      // 快速检测 AI 状态
+      try {
+        const res = await chatApi.ask('你好');
+        chatContext.aiAvailable = !!(res.status === 'success' && res.answer);
+      } catch { chatContext.aiAvailable = false; }
+      if (!chatContext.aiAvailable) {
+        addChatBubble('warning', '⚠️ AI 服务暂未开启，浏览历史记录中。');
+      }
+      saveChatToStorage();
+      return;
+    }
 
     // 先检测 AI 服务是否可用
     addChatBubble('assistant', '', true);
@@ -582,6 +643,7 @@ window.openTravelChat = async function() {
 
     chatHistory.push({ role: 'assistant', content: greeting });
     addChatBubble('assistant', greeting, false, true);
+    saveChatToStorage();
   }
 };
 
@@ -676,6 +738,7 @@ ${historyStr}
     chatHistory.push({ role: 'assistant', content: fallback });
     addChatBubble('assistant', fallback, false, true);
   }
+  saveChatToStorage();
 };
 
 // ==================== 页面初始化 ====================
