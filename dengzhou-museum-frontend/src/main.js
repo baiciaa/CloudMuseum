@@ -530,8 +530,8 @@ function createChatDialog() {
       </div>
       <div class="chat-messages" id="chat-messages">
         <div class="chat-welcome">
-          <p>你好！我是登州博物馆旅行顾问。</p>
-          <p>正在为您分析实时数据...</p>
+          <p>登州小吏恭候多时</p>
+          <p>正在叩问云端...</p>
         </div>
       </div>
       <div class="chat-input-area">
@@ -546,6 +546,7 @@ function createChatDialog() {
 window.closeTravelChat = function() {
   const overlay = document.getElementById('travel-chat-overlay');
   if (overlay) overlay.remove();
+  chatContext = null;
   chatHistory = [];
   isTyping = false;
 };
