@@ -4,8 +4,8 @@
     left: 0; top: 0;
     width: var(--nav-width);
     height: 100vh;
-    background: rgba(253, 250, 245, 0.96);
-    backdrop-filter: blur(10px);
+    background: rgba(253, 250, 245, 0.97);
+    backdrop-filter: blur(12px);
     border-right: 1px solid var(--border-subtle);
     z-index: 1000;
     display: flex;
@@ -22,6 +22,17 @@
     color: var(--gold);
     text-align: center;
     font-weight: 700;
+    position: relative;
+}
+.nav-logo::after {
+    content: '登州';
+    position: absolute;
+    bottom: 10px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    letter-spacing: 6px;
+    color: var(--text-muted);
+    font-weight: 400;
 }
 
 .nav-menu {
@@ -56,17 +67,16 @@
     width: 3px;
     height: 60%;
     background: var(--gold);
-    box-shadow: 0 0 8px rgba(196, 162, 101, 0.4);
+    box-shadow: 0 0 10px rgba(196, 162, 101, 0.5);
 }
 
 /* ==================== 主内容区 ==================== */
 .main-content {
     margin-left: var(--nav-width);
-    padding:0 40px;
-    overflow-x:hidden;
-    min-width:0;
-
-    }
+    padding: 0 40px;
+    overflow-x: hidden;
+    min-width: 0;
+}
 
 .section {
     min-height: 100vh;
@@ -89,10 +99,36 @@
     overflow: hidden;
 }
 
+/* 卡片角标装饰 */
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 24px; height: 24px;
+    border-left: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 24px; height: 24px;
+    border-right: 1px solid var(--border-subtle);
+    border-top: 1px solid var(--border-subtle);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.card:hover::before,
+.card:hover::after {
+    opacity: 1;
+}
+
 .card:hover {
     border-color: var(--border-glow);
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(196, 162, 101, 0.08);
+    box-shadow: 0 12px 32px rgba(196, 162, 101, 0.1);
 }
 
 .card-title {
@@ -124,7 +160,8 @@
 
 .btn-primary:hover {
     background: rgba(196, 162, 101, 0.08);
-    box-shadow: 0 0 16px rgba(196, 162, 101, 0.2);
+    box-shadow: 0 0 20px rgba(196, 162, 101, 0.25);
+    transform: translateY(-1px);
 }
 
 .btn-primary::before {
@@ -135,12 +172,95 @@
     background: linear-gradient(90deg, transparent, rgba(196, 162, 101, 0.15), transparent);
     transition: left 0.5s;
 }
+.btn-primary:hover::before { left: 100%; }
 
-.btn-primary:hover::before {
+/* ==================== 文物卡片网格 ==================== */
+.relic-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+@media (max-width: 1400px) { .relic-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 900px)  { .relic-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px)  { .relic-grid { grid-template-columns: 1fr; } }
+
+.relic-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 2px;
+    overflow: hidden;
+    transition: all var(--transition-speed);
+    cursor: pointer;
+    position: relative;
+}
+
+/* 金色光扫 */
+.relic-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: -100%;
+    width: 100%; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    transition: left 0.6s ease;
+    z-index: 2;
+}
+
+.relic-card:hover {
+    border-color: var(--border-glow);
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(196, 162, 101, 0.12);
+}
+.relic-card:hover::after {
     left: 100%;
 }
 
-/* ==================== Unity容器预留 ==================== */
+.relic-card .card-img {
+    width: 100%;
+    height: 220px;
+    background: linear-gradient(135deg, #f5efe0 0%, #e8dcc8 100%);
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.relic-card .card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+.relic-card:hover .card-img img {
+    transform: scale(1.08);
+}
+
+/* 骨架屏 */
+.skeleton {
+    background: linear-gradient(90deg, #f0ebe0 25%, #e8dcc8 50%, #f0ebe0 75%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.5s ease-in-out infinite;
+    border-radius: 2px;
+}
+
+@keyframes skeletonShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.skeleton-img {
+    width: 100%;
+    height: 220px;
+}
+.skeleton-text {
+    height: 14px;
+    margin: 12px 20px;
+}
+.skeleton-text:last-child {
+    width: 60%;
+    margin-bottom: 20px;
+}
+
+/* ==================== Unity容器 ==================== */
 #unity-container {
     width: 100%;
     height: 60vh;
@@ -156,62 +276,110 @@
     position: relative;
     overflow: hidden;
 }
-
 #unity-container canvas,
 #unity-container iframe {
     width: 100% !important;
     height: 100% !important;
 }
 
-/* ==================== 文物卡片网格 ==================== */
-.relic-grid {
+/* ==================== 旅行攻略天气面板 ==================== */
+.tour-panels {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
-}
-
-@media (max-width: 1400px) {
-    .relic-grid { grid-template-columns: repeat(3, 1fr); }
+    gap: 16px;
 }
 
 @media (max-width: 900px) {
-    .relic-grid { grid-template-columns: repeat(2, 1fr); }
+    .tour-panels { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 600px) {
-    .relic-grid { grid-template-columns: 1fr; }
+.tour-card-icon {
+    font-size: 36px;
+    margin-bottom: 8px;
+    transition: transform 0.3s;
+    display: inline-block;
+}
+.card:hover .tour-card-icon {
+    transform: scale(1.15);
 }
 
-.relic-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    border-radius: 2px;
-    overflow: hidden;
-    transition: all var(--transition-speed);
-    cursor: pointer;
-}
-
-.relic-card:hover {
-    border-color: var(--border-glow);
-    transform: translateY(-6px);
-    box-shadow: 0 12px 32px rgba(196, 162, 101, 0.1);
-}
-
-.relic-card .card-img {
-    width: 100%;
-    height: 220px;
-    background: linear-gradient(135deg, #f5efe0 0%, #e8dcc8 100%);
+/* ==================== 漫游入口卡片 ==================== */
+.tour-entrance {
     position: relative;
+    border-radius: 4px;
     overflow: hidden;
-    border-bottom: 1px solid var(--border-subtle);
+    border: 2px solid var(--border-subtle);
+    cursor: pointer;
+    transition: all 0.4s;
+}
+.tour-entrance:hover {
+    border-color: var(--border-glow);
+    box-shadow: 0 12px 40px rgba(196,162,101,0.2);
 }
 
-.relic-card .card-img img {
-    transition: transform 0.4s ease;
+.tour-entrance-bg {
+    width: 100%;
+    height: 280px;
+    background: linear-gradient(135deg, #f5efe0 0%, #e0d5bc 50%, #d4c8a8 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+.tour-entrance-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(196,162,101,0.08) 0%, transparent 60%);
 }
 
-.relic-card:hover .card-img img {
-    transform: scale(1.05);
+.tour-entrance-icon {
+    font-size: 72px;
+    margin-bottom: 12px;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+}
+
+.play-btn-circle {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: playPulse 2s ease-in-out infinite;
+}
+
+@keyframes playPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(196,162,101,0.4); }
+    50% { box-shadow: 0 0 0 16px rgba(196,162,101,0); }
+}
+
+/* ==================== 研学中心卡片 ==================== */
+.edu-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+@media (max-width: 900px) {
+    .edu-grid { grid-template-columns: 1fr; }
+}
+
+.edu-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+.card:hover .edu-icon {
+    animation: iconBounce 0.6s ease;
+}
+
+@keyframes iconBounce {
+    0%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-12px); }
+    50% { transform: translateY(0); }
+    70% { transform: translateY(-6px); }
 }
 
 /* ==================== 弹窗通用 ==================== */
@@ -225,6 +393,7 @@
     align-items: center;
     justify-content: center;
     animation: fadeIn 0.2s ease;
+    backdrop-filter: blur(4px);
 }
 
 @keyframes fadeIn {
@@ -242,6 +411,7 @@
     width: 90%;
     max-height: 80vh;
     overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
 }
 
 .modal-panel.modal-lg {
@@ -370,13 +540,11 @@
     flex-direction: column;
     gap: 4px;
 }
-
 .form-group label {
     font-size: 12px;
     color: var(--text-secondary);
     letter-spacing: 1px;
 }
-
 .form-group input,
 .form-group textarea {
     padding: 10px 12px;
@@ -389,7 +557,6 @@
     transition: border-color var(--transition-speed);
     outline: none;
 }
-
 .form-group input:focus,
 .form-group textarea:focus {
     border-color: var(--gold);
@@ -541,9 +708,7 @@
     outline: none;
     transition: border-color var(--transition-speed);
 }
-.chat-input:focus {
-    border-color: var(--gold);
-}
+.chat-input:focus { border-color: var(--gold); }
 
 .chat-send-btn {
     padding: 10px 20px;
@@ -564,13 +729,7 @@
 
 /* ==================== 响应式 ==================== */
 @media (max-width: 480px) {
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-    .modal-panel {
-        padding: 24px;
-    }
-    .chat-overlay {
-        width: 100vw;
-    }
+    .form-row { grid-template-columns: 1fr; }
+    .modal-panel { padding: 24px; }
+    .chat-overlay { width: 100vw; }
 }

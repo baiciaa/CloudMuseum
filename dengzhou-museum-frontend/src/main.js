@@ -206,8 +206,13 @@ async function loadRelics() {
   const grid = document.getElementById('relic-grid');
   if (!grid) return;
 
+  // 骨架屏占位
   const perPage = calcPerPage();
-  // 一次性加载全部数据，前端分页
+  grid.innerHTML = Array.from({length: perPage}, () => `
+    <div class="relic-card"><div class="skeleton skeleton-img"></div>
+    <div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text"></div></div>
+  `).join('');
+
   const result = await relicApi.list('', '', 1, 200);
   const relics = result?.data?.list || [];
 

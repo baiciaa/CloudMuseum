@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登州博物馆 · 云端漫游 | DENGZHOU MUSEUM</title>
-
 </head>
 <body>
 
@@ -27,21 +26,26 @@
     <!-- ==================== 主内容区 ==================== -->
     <main class="main-content">
 
-        <!-- ========== S1: 首页 ========== -->
-        <section id="section-home" class="section active">
+        <!-- ========== S1: 首页 Hero ========== -->
+        <section id="section-home" class="section section-hero">
+            <div class="hero-particles">
+                <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+                <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+                <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+                <div class="particle"></div>
+            </div>
             <div class="hero-content">
-                <h1 class="hero-title neon-text" style="font-family:var(--font-display); font-size:clamp(36px, 6vw, 72px); letter-spacing:8px;">
-                    登州博物馆
-                </h1>
-                <p style="color:var(--text-secondary); font-size:16px; margin:24px 0 40px;">
-                    云端漫游 · 穿越千年的古港记忆<br>
-                    DENGZHOU MUSEUM — VIRTUAL TOUR
+                <p class="hero-subtitle">DENGZHOU MUSEUM</p>
+                <h1 class="hero-title neon-text">登州博物馆</h1>
+                <p class="hero-desc">
+                    云端漫游 · 穿越千年的古港记忆
                 </p>
-                <div style="display:flex; gap:20px;">
-                    <button class="btn-primary" onclick="window.location.href='/tour.html'">
+                <div class="hero-actions">
+                    <button class="btn-primary btn-ripple" onclick="window.location.href='/tour.html'">
                         进入漫游 ENTER
                     </button>
-                    <button class="btn-primary" onclick="window.openTravelChat()" style="border-color:var(--red-accent); color:var(--red-accent);">
+                    <button class="btn-primary btn-ripple" onclick="window.openTravelChat()"
+                        style="border-color:var(--red-accent); color:var(--red-accent);">
                         旅行攻略 PLAN
                     </button>
                 </div>
@@ -51,9 +55,14 @@
         <!-- ========== S2: 历史背景 ========== -->
         <section id="section-history" class="section">
             <div class="section-header fade-in-up">
-                <span style="font-family:var(--font-display); font-size:12px; letter-spacing:4px; color:var(--gold);">HISTORY</span>
-                <h2 style="font-size:32px; margin-top:12px;">历史背景</h2>
-                <div style="width:60px; height:1px; background:var(--gold); margin:20px 0;"></div>
+                <span class="section-label">HISTORY</span>
+                <h2 class="section-title">历史背景</h2>
+                <p class="section-subtitle">千年古港 · 东方海上丝绸之路始发港</p>
+                <div class="section-divider">
+                    <span class="divider-icon">
+                        <svg width="28" height="28" viewBox="0 0 28 28"><path d="M14 2C7.4 2 2 7.4 2 14s5.4 12 12 12 12-5.4 12-12S20.6 2 14 2zm0 20c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z" fill="none" stroke="#c4a265" stroke-width="1"/><circle cx="14" cy="14" r="4" fill="#c4a265" opacity="0.4"/></svg>
+                    </span>
+                </div>
             </div>
             <div class="history-timeline" id="history-grid">
                 <p style="color:var(--text-secondary); text-align:center;">历史内容加载中...</p>
@@ -63,9 +72,14 @@
         <!-- ========== S3: 重点文物 ========== -->
         <section id="section-relics" class="section">
             <div class="section-header fade-in-up">
-                <span style="font-family:var(--font-display); font-size:12px; letter-spacing:4px; color:var(--gold);">RELICS</span>
-                <h2 style="font-size:32px; margin-top:12px;">重点文物</h2>
-                <div style="width:60px; height:1px; background:var(--gold); margin:20px 0;"></div>
+                <span class="section-label">RELICS</span>
+                <h2 class="section-title">重点文物</h2>
+                <p class="section-subtitle">馆藏精品 · 穿越千年的历史见证</p>
+                <div class="section-divider">
+                    <span class="divider-icon">
+                        <svg width="28" height="28" viewBox="0 0 28 28"><rect x="4" y="6" width="20" height="16" rx="1" fill="none" stroke="#c4a265" stroke-width="1"/><line x1="10" y1="11" x2="18" y2="11" stroke="#c4a265" stroke-width="0.8" opacity="0.5"/><line x1="10" y1="15" x2="16" y2="15" stroke="#c4a265" stroke-width="0.8" opacity="0.5"/></svg>
+                    </span>
+                </div>
             </div>
             <div class="relic-grid fade-in-up delay-1" id="relic-grid" style="margin-top:40px;">
                 <p style="color:var(--text-secondary); grid-column:1/-1; text-align:center;">文物数据加载中...</p>
@@ -76,36 +90,41 @@
         <!-- ========== S4: 旅行攻略 ========== -->
         <section id="section-tour" class="section">
             <div class="section-header fade-in-up">
-                <span style="font-family:var(--font-display); font-size:12px; letter-spacing:4px; color:var(--neon-cyan);">TOUR</span>
-                <h2 style="font-size:32px; margin-top:12px;">智能旅行攻略</h2>
-                <div style="width:60px; height:1px; background:var(--neon-cyan); margin:20px 0;"></div>
+                <span class="section-label" style="color:var(--neon-cyan);">TOUR</span>
+                <h2 class="section-title">智能旅行攻略</h2>
+                <p class="section-subtitle">实时位置 · 天气 · 人流量多维分析</p>
+                <div class="section-divider">
+                    <span class="divider-icon">
+                        <svg width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="10" r="3" fill="none" stroke="#5ba0b8" stroke-width="1"/><path d="M14 13c-4 6-8 9-8 9h16s-4-3-8-9z" fill="none" stroke="#5ba0b8" stroke-width="1"/></svg>
+                    </span>
+                </div>
             </div>
 
-            <div class="tour-panels fade-in-up delay-1" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-top:20px;">
+            <div class="tour-panels fade-in-up delay-1" style="margin-top:20px;">
                 <div class="card" style="text-align:center;">
-                    <div style="font-size:32px; margin-bottom:8px;">&#x1f4cd;</div>
+                    <div class="tour-card-icon">&#x1f4cd;</div>
                     <div class="card-title" style="margin:0;">你的位置</div>
                     <p id="user-location" style="color:var(--text-secondary); font-size:13px;">获取中...</p>
                 </div>
                 <div class="card" style="text-align:center;">
-                    <div style="font-size:32px; margin-bottom:8px;">&#x1f324;</div>
+                    <div class="tour-card-icon">&#x1f324;</div>
                     <div class="card-title" style="margin:0;">实时天气</div>
                     <p id="weather-info" style="color:var(--text-secondary); font-size:13px;">加载中...</p>
                 </div>
                 <div class="card" style="text-align:center;">
-                    <div style="font-size:32px; margin-bottom:8px;">&#x1f465;</div>
+                    <div class="tour-card-icon">&#x1f465;</div>
                     <div class="card-title" style="margin:0;">人流量预测</div>
                     <p id="crowd-info" style="color:var(--text-secondary); font-size:13px;">计算中...</p>
                 </div>
                 <div class="card" style="text-align:center;">
-                    <div style="font-size:32px; margin-bottom:8px;">&#x1f3ab;</div>
+                    <div class="tour-card-icon">&#x1f3ab;</div>
                     <div class="card-title" style="margin:0;">票务信息</div>
                     <p style="color:var(--text-secondary); font-size:13px;">免费参观（需预约）</p>
                 </div>
             </div>
 
             <div class="fade-in-up delay-2" style="margin-top:30px; text-align:center;">
-                <button class="btn-primary" onclick="generateTourPlan()" style="font-size:14px; padding:16px 48px;">
+                <button class="btn-primary btn-ripple" onclick="generateTourPlan()" style="font-size:14px; padding:16px 48px;">
                     &#x1f916; AI 生成出行攻略
                 </button>
                 <p style="color:var(--text-secondary); font-size:11px; margin-top:12px;">
@@ -122,20 +141,24 @@
         <!-- ========== S5: 云端漫游 ========== -->
         <section id="section-explore" class="section">
             <div class="section-header fade-in-up">
-                <span style="font-family:var(--font-display); font-size:12px; letter-spacing:4px; color:var(--gold);">EXPLORE</span>
-                <h2 style="font-size:32px; margin-top:12px;">云端漫游</h2>
-                <p style="color:var(--text-secondary); margin-top:8px;">720&deg;全景 &middot; 身临其境感受千年古港</p>
-                <div style="width:60px; height:1px; background:var(--gold); margin:20px 0;"></div>
+                <span class="section-label">EXPLORE</span>
+                <h2 class="section-title">云端漫游</h2>
+                <p class="section-subtitle">720&deg;全景 &middot; 身临其境感受千年古港</p>
+                <div class="section-divider">
+                    <span class="divider-icon">
+                        <svg width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="10" fill="none" stroke="#c4a265" stroke-width="1"/><polygon points="11,9 11,19 20,14" fill="#c4a265" opacity="0.5"/></svg>
+                    </span>
+                </div>
             </div>
 
             <div class="fade-in-up delay-1" style="max-width:600px; margin:40px auto 0;">
-                <div style="position:relative; border-radius:4px; overflow:hidden; border:2px solid var(--border-subtle); transition:all 0.4s; cursor:pointer;"
+                <div class="tour-entrance"
                      onmouseenter="this.style.borderColor='var(--border-glow)'; this.style.boxShadow='0 8px 32px rgba(196,162,101,0.2)';"
                      onmouseleave="this.style.borderColor='var(--border-subtle)'; this.style.boxShadow='none';"
                      onclick="enterMuseumTour()">
-                    <div style="width:100%; height:280px; background:linear-gradient(135deg, #f5efe0 0%, #e8dcc8 100%); display:flex; align-items:center; justify-content:center; position:relative;">
-                        <div style="text-align:center;">
-                            <div style="font-size:64px; margin-bottom:12px;">&#x1f3db;</div>
+                    <div class="tour-entrance-bg">
+                        <div style="text-align:center;position:relative;z-index:1;">
+                            <div class="tour-entrance-icon">&#x1f3db;</div>
                             <span style="font-family:var(--font-display); font-size:13px; color:var(--text-secondary); letter-spacing:2px;">登州博物馆 &middot; 全景漫游入口</span>
                         </div>
                         <div style="position:absolute; bottom:0; left:0; right:0; height:60px; background:linear-gradient(to top, rgba(245,239,224,0.9), transparent);"></div>
@@ -146,7 +169,7 @@
                                 <h3 style="font-family:var(--font-display); font-size:18px; color:var(--gold); letter-spacing:3px; margin-bottom:6px;">登州博物馆</h3>
                                 <p style="color:var(--text-secondary); font-size:13px;">开启720&deg;云端漫游之旅</p>
                             </div>
-                            <div style="width:44px; height:44px; border-radius:50%; border:2px solid var(--gold); display:flex; align-items:center; justify-content:center;">
+                            <div class="play-btn-circle">
                                 <span style="font-size:18px; color:var(--gold);">&#x25b6;</span>
                             </div>
                         </div>
@@ -181,15 +204,19 @@
         <!-- ========== S6: 研学中心 ========== -->
         <section id="section-education" class="section">
             <div class="section-header fade-in-up">
-                <span style="font-family:var(--font-display); font-size:12px; letter-spacing:4px; color:var(--neon-cyan);">EDUCATION</span>
-                <h2 style="font-size:32px; margin-top:12px;">研学中心</h2>
-                <p style="color:var(--text-secondary); margin-top:8px;">面向中小学研学旅行 &middot; 沉浸式历史文化课堂</p>
-                <div style="width:60px; height:1px; background:var(--neon-cyan); margin:20px 0;"></div>
+                <span class="section-label" style="color:var(--neon-cyan);">EDUCATION</span>
+                <h2 class="section-title">研学中心</h2>
+                <p class="section-subtitle">中小学研学旅行 &middot; 沉浸式历史文化课堂</p>
+                <div class="section-divider">
+                    <span class="divider-icon">
+                        <svg width="28" height="28" viewBox="0 0 28 28"><path d="M4 6h20v16H4z" fill="none" stroke="#5ba0b8" stroke-width="1"/><line x1="8" y1="11" x2="20" y2="11" stroke="#5ba0b8" stroke-width="0.8" opacity="0.5"/><line x1="8" y1="15" x2="16" y2="15" stroke="#5ba0b8" stroke-width="0.8" opacity="0.5"/><circle cx="22" cy="20" r="4" fill="#5ba0b8" opacity="0.2" stroke="#5ba0b8" stroke-width="1"/></svg>
+                    </span>
+                </div>
             </div>
 
-            <div class="edu-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:24px; margin-top:40px;">
+            <div class="edu-grid" style="margin-top:40px;">
                 <div class="card fade-in-up delay-2" style="text-align:center;">
-                    <div style="font-size:48px; margin-bottom:16px;">&#x1f4da;</div>
+                    <div class="edu-icon">&#x1f4da;</div>
                     <div class="card-title">研学课程</div>
                     <p style="color:var(--text-secondary); font-size:13px;">
                         "海上丝路探秘"<br>"抗倭英雄·戚继光文化"<br>"文物鉴赏与历史"
@@ -197,7 +224,7 @@
                     <button class="btn-primary" style="margin-top:16px;" onclick="window.showCoursesModal()">了解课程</button>
                 </div>
                 <div class="card fade-in-up delay-3" style="text-align:center;">
-                    <div style="font-size:48px; margin-bottom:16px;">&#x1f3eb;</div>
+                    <div class="edu-icon">&#x1f3eb;</div>
                     <div class="card-title">团体预约</div>
                     <p style="color:var(--text-secondary); font-size:13px;">
                         中小学团体参观预约<br>专属导览服务<br>研学活动定制
@@ -205,7 +232,7 @@
                     <button class="btn-primary" style="margin-top:16px;" onclick="window.showReservationModal()">立即预约</button>
                 </div>
                 <div class="card fade-in-up delay-4" style="text-align:center;">
-                    <div style="font-size:48px; margin-bottom:16px;">&#x1f3af;</div>
+                    <div class="edu-icon">&#x1f3af;</div>
                     <div class="card-title">互动学习</div>
                     <p style="color:var(--text-secondary); font-size:13px;">
                         3D文物拼图<br>古港知识问答<br>鸳鸯阵虚拟体验
@@ -216,6 +243,14 @@
         </section>
 
     </main>
+
+    <!-- ==================== 页脚 ==================== -->
+    <footer class="site-footer">
+        <div class="footer-left">DENGZHOU MUSEUM</div>
+        <div class="footer-right">
+            登州博物馆<span>|</span>蓬莱 · 烟台<span>|</span>东方海上丝绸之路始发港
+        </div>
+    </footer>
 
     <!-- JS模块引入 -->
     <script type="module" src="/src/main.js"></script>
