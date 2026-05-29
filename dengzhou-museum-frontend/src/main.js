@@ -556,12 +556,28 @@ window.openTravelChat = async function() {
   overlay.style.display = 'flex';
 
   if (!chatContext) {
-    chatContext = { initialized: true };
+    chatContext = { initialized: true, aiAvailable: false };
     chatHistory = [];
-
     document.getElementById('chat-messages').innerHTML = '';
 
+    // 先检测 AI 服务是否可用
+    addChatBubble('assistant', '', true);
+    setChatInputEnabled(false);
+    let aiOk = false;
+    try {
+      const res = await chatApi.ask('你好');
+      if (res.status === 'success' && res.answer) {
+        aiOk = true;
+        chatContext.aiAvailable = true;
+      }
+    } catch { /* AI unavailable */ }
+    removeLastThinkingBubble();
+
     const greeting = '在下登州小吏，乃登州博物馆云端导览使。\n\n于此间，我可为您解说馆藏文物之精粹、登州古港之千年沧桑、戚继光之英风烈骨、东方海上丝路之壮阔篇章。\n\n馆中有战国铜剑寒光未褪、西周青铜礼器庄重如初、明清海防火器犹带硝烟——件件皆是蓬莱古港的岁月见证。\n\n若有疑问，尽管道来，小吏愿为君细述。';
+
+    if (!aiOk) {
+      addChatBubble('warning', '⚠️ AI 服务暂未开启，小吏暂以预设内容为君导览。');
+    }
 
     chatHistory.push({ role: 'assistant', content: greeting });
     addChatBubble('assistant', greeting, false, true);
@@ -577,7 +593,8 @@ function removeLastThinkingBubble() {
 function addChatBubble(role, text, isThinking, animate) {
   const msgs = document.getElementById('chat-messages');
   const div = document.createElement('div');
-  div.className = 'chat-bubble ' + (role === 'user' ? 'chat-user' : 'chat-assistant');
+  const cls = role === 'user' ? 'chat-user' : role === 'warning' ? 'chat-warning' : 'chat-assistant';
+  div.className = 'chat-bubble ' + cls;
 
   if (isThinking) {
     div.classList.add('chat-thinking');
@@ -643,6 +660,7 @@ ${historyStr}
 请以登州小吏的口吻回复：`;
 
   try {
+    if (!chatContext.aiAvailable) throw new Error('AI unavailable');
     const res = await chatApi.ask(prompt);
     if (res.status === 'success' && res.answer) {
       removeLastThinkingBubble();
