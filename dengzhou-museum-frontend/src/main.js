@@ -849,7 +849,6 @@ let eduPage = 1;
 async function loadNotices(page, reset) {
   const container = document.getElementById('notice-list');
   if (!container) return;
-  if (reset) { noticePage = 1; page = 1; }
   if (reset) container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-secondary);font-size:13px;">加载中...</div>';
   const r = await announcementApi.list('NOTICE', page, 5);
   const list = r.data?.list || [];
