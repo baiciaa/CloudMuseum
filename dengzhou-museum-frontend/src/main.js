@@ -838,8 +838,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 加载研学动态
   loadEduNews(1);
 
-  window.loadMoreNotices = () => loadNotices(++noticePage, false);
-  window.loadMoreEdu = () => loadEduNews(++eduPage);
+  window.loadMoreNotices = () => loadNotices(noticePage + 1, false);
+  window.loadMoreEdu = () => loadEduNews(eduPage + 1);
 });
 
 // ==================== 资讯公告 & 研学动态 ====================
@@ -872,9 +872,7 @@ async function loadNotices(page, reset) {
     container.appendChild(d);
   });
   const total = r.data?.total || 0;
-  const loaded = container.querySelectorAll('div').length;
-  const moreBtn = document.getElementById('notice-more');
-  if (moreBtn) moreBtn.style.display = loaded < total ? 'block' : 'none';
+  renderNoticePager(container, page, total, 5);
 }
 
 async function loadEduNews(page) {
@@ -904,9 +902,7 @@ async function loadEduNews(page) {
     container.appendChild(d);
   });
   const total = r.data?.total || 0;
-  const loaded = container.querySelectorAll('.relic-card').length;
-  const moreBtn = document.getElementById('edu-more');
-  if (moreBtn) moreBtn.style.display = loaded < total ? 'block' : 'none';
+  renderEduPager(container, page, total, 6);
 }
 
 window.showAnnouncementDetail = function(item) {
@@ -923,6 +919,44 @@ window.showAnnouncementDetail = function(item) {
   document.body.appendChild(overlay);
   overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
 };
+
+function renderNoticePager(container, page, total, perPage) {
+  const oldPag = document.getElementById('notice-pagination');
+  if (oldPag) oldPag.remove();
+  const totalPages = Math.ceil(total / perPage);
+  if (totalPages <= 1) return;
+  const pag = document.createElement('div');
+  pag.id = 'notice-pagination';
+  pag.style.cssText = 'text-align:center;margin-top:20px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;';
+  for (let p = 1; p <= totalPages; p++) {
+    const btn = document.createElement('button');
+    btn.textContent = p;
+    btn.className = 'btn btn-sm';
+    if (p === page) { btn.style.background = 'var(--accent)'; btn.style.color = '#fff'; btn.style.borderColor = 'var(--accent)'; }
+    btn.onclick = () => loadNotices(p, true);
+    pag.appendChild(btn);
+  }
+  container.after(pag);
+}
+
+function renderEduPager(container, page, total, perPage) {
+  const oldPag = document.getElementById('edu-pagination');
+  if (oldPag) oldPag.remove();
+  const totalPages = Math.ceil(total / perPage);
+  if (totalPages <= 1) return;
+  const pag = document.createElement('div');
+  pag.id = 'edu-pagination';
+  pag.style.cssText = 'text-align:center;margin-top:16px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;';
+  for (let p = 1; p <= totalPages; p++) {
+    const btn = document.createElement('button');
+    btn.textContent = p;
+    btn.className = 'btn btn-sm';
+    if (p === page) { btn.style.background = 'var(--accent)'; btn.style.color = '#fff'; btn.style.borderColor = 'var(--accent)'; }
+    btn.onclick = () => loadEduNews(p);
+    pag.appendChild(btn);
+  }
+  container.after(pag);
+}
 
 function escHtml(s) {
   if (!s) return '';
