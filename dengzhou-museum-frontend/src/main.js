@@ -458,10 +458,27 @@ import { travelApi, chatApi } from './api/index.js';
 
 // ==================== 聊天窗状态 ====================
 const CHAT_STORAGE_KEY = 'dengzhou_chat_history';
+const AI_CHECK_COOLDOWN = 60000;  // AI 检测冷却时间 60 秒
 let chatContext = null;     // { initialized, aiAvailable }
 let chatHistory = [];       // [{ role, content }]
 let isTyping = false;
 let chatBusy = false;       // AI 回复期间锁定输入
+let aiCheckCache = { timestamp: 0, available: false };
+
+async function checkAiAvailability() {
+  const now = Date.now();
+  if (now - aiCheckCache.timestamp < AI_CHECK_COOLDOWN) {
+    return aiCheckCache.available;
+  }
+  try {
+    const res = await chatApi.ask('测试');
+    aiCheckCache.available = !!(res.status === 'success' && res.answer);
+  } catch {
+    aiCheckCache.available = false;
+  }
+  aiCheckCache.timestamp = now;
+  return aiCheckCache.available;
+}
 
 function saveChatToStorage() {
   try {
@@ -619,11 +636,8 @@ window.openTravelChat = async function() {
       document.getElementById('chat-messages').innerHTML = '';
       // 渲染历史消息（不带动画）
       chatHistory.forEach(m => addChatBubble(m.role, m.content, false, false));
-      // 快速检测 AI 状态
-      try {
-        const res = await chatApi.ask('你好');
-        chatContext.aiAvailable = !!(res.status === 'success' && res.answer);
-      } catch { chatContext.aiAvailable = false; }
+      // 快速检测 AI 状态（带缓存）
+      chatContext.aiAvailable = await checkAiAvailability();
       if (!chatContext.aiAvailable) {
         addChatBubble('warning', '⚠️ AI 服务暂未开启，浏览历史记录中。');
       }
@@ -631,17 +645,11 @@ window.openTravelChat = async function() {
       return;
     }
 
-    // 先检测 AI 服务是否可用
+    // 先检测 AI 服务是否可用（带缓存）
     addChatBubble('assistant', '', true);
     setChatInputEnabled(false);
-    let aiOk = false;
-    try {
-      const res = await chatApi.ask('你好');
-      if (res.status === 'success' && res.answer) {
-        aiOk = true;
-        chatContext.aiAvailable = true;
-      }
-    } catch { /* AI unavailable */ }
+    chatContext.aiAvailable = await checkAiAvailability();
+    const aiOk = chatContext.aiAvailable;
     removeLastThinkingBubble();
 
     const greeting = '在下登州小吏，乃登州博物馆云端导览使。\n\n于此间，我可为您解说馆藏文物之精粹、登州古港之千年沧桑、戚继光之英风烈骨、东方海上丝路之壮阔篇章。\n\n馆中有战国铜剑寒光未褪、西周青铜礼器庄重如初、明清海防火器犹带硝烟——件件皆是蓬莱古港的岁月见证。\n\n若有疑问，尽管道来，小吏愿为君细述。';
@@ -732,7 +740,8 @@ ${historyStr}
 请以登州小吏的口吻回复：`;
 
   try {
-    if (!chatContext.aiAvailable) throw new Error('AI unavailable');
+    const aiReady = chatContext?.aiAvailable ?? await checkAiAvailability();
+    if (!aiReady) throw new Error('AI unavailable');
     const res = await chatApi.ask(prompt);
     if (res.status === 'success' && res.answer) {
       removeLastThinkingBubble();
