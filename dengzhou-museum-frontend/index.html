@@ -250,8 +250,8 @@
 
             <div style="margin-top:32px;">
                 <h3 style="font-family:var(--font-display);font-size:16px;letter-spacing:2px;color:var(--gold);margin-bottom:16px;">研学动态</h3>
-                <div id="edu-news-list" class="relic-grid" style="gap:16px;">
-                    <div style="text-align:center;padding:40px;color:var(--text-secondary);font-size:13px;grid-column:1/-1;">加载中...</div>
+                <div id="edu-news-list">
+                    <div style="text-align:center;padding:40px;color:var(--text-secondary);font-size:13px;">加载中...</div>
                 </div>
             </div>
 
@@ -272,6 +272,14 @@
                     </p>
                     <button class="btn-primary" style="margin-top:16px;" onclick="window.showReservationModal()">立即预约</button>
                 </div>
+                <div class="card fade-in-up delay-4" style="text-align:center;">
+                    <div class="edu-icon">&#x1f465;</div>
+                    <div class="card-title">招募报名</div>
+                    <p style="color:var(--text-secondary); font-size:13px;">
+                        志愿者招募<br>活动参与者招募<br>填写个人信息报名
+                    </p>
+                    <button class="btn-primary" style="margin-top:16px;" onclick="window.showRecruitmentModal()">立即报名</button>
+                </div>
             </div>
         </section>
 
@@ -281,7 +289,7 @@
     <footer class="site-footer">
         <div class="footer-left">DENGZHOU MUSEUM</div>
         <div class="footer-right">
-            登州博物馆<span>|</span>蓬莱 · 烟台<span>|</span>东方海上丝绸之路始发港
+            登州博物馆<span>|</span>蓬莱 · 烟台<span>|</span>联系电话：0535-5668021<span>|</span>东方海上丝绸之路始发港
         </div>
     </footer>
 
@@ -294,5 +302,16 @@
 
     <!-- JS模块引入 -->
     <script type="module" src="/src/main.js"></script>
+    <!-- 网站浏览统计 -->
+    <script>
+    (function() {
+        fetch('/api/visits/track', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pagePath: window.location.pathname }),
+            keepalive: true
+        }).catch(function(){});
+    })();
+    </script>
 </body>
 </html>
