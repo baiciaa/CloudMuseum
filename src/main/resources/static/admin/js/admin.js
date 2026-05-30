@@ -387,16 +387,100 @@ const app = {
         }
     },
 
+    drawVisitChart(canvasId, trend) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas || !trend || trend.length === 0) return;
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = rect.height + 'px';
+        ctx.scale(dpr, dpr);
+
+        const w = rect.width, h = rect.height;
+        const pad = { top: 8, bottom: 20, left: 8, right: 8 };
+        const cw = w - pad.left - pad.right;
+        const ch = h - pad.top - pad.bottom;
+
+        const pvs = trend.map(t => t.pv);
+        const max = Math.max(...pvs, 1);
+        const barW = Math.min(28, cw / trend.length * 0.6);
+        const gap = cw / trend.length;
+
+        ctx.clearRect(0, 0, w, h);
+
+        // 柱状图
+        pvs.forEach((pv, i) => {
+            const barH = (pv / max) * ch;
+            const x = pad.left + i * gap + (gap - barW) / 2;
+            const y = pad.top + ch - barH;
+
+            // 渐变柱
+            const grad = ctx.createLinearGradient(x, y, x, pad.top + ch);
+            grad.addColorStop(0, '#b8942e');
+            grad.addColorStop(1, 'rgba(185,148,46,0.2)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.roundRect(x, y, barW, barH, [2, 2, 0, 0]);
+            ctx.fill();
+
+            // 数值
+            ctx.fillStyle = '#6b5d50';
+            ctx.font = '9px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(pv, pad.left + i * gap + gap / 2, y - 4);
+
+            // 日期标签
+            const label = trend[i].date.slice(5);
+            ctx.fillText(label, pad.left + i * gap + gap / 2, pad.top + ch + 14);
+        });
+    },
+
     async renderDashboard(main) {
         main.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-        const r = await api.get('/admin/stats');
-        if (!r.success) { main.innerHTML = '<p>加载失败</p>'; return; }
-        const stats = r.data;
+        const [entityR, visitR] = await Promise.all([
+            api.get('/admin/stats'),
+            api.get('/admin/visits/stats')
+        ]);
+        if (!entityR.success) { main.innerHTML = '<p>加载失败</p>'; return; }
+        const stats = entityR.data;
+        const visitStats = visitR.success ? visitR.data : null;
         main.innerHTML = `
             <div class="page-header">
                 <h2>控制台</h2>
                 <p>系统数据概览</p>
             </div>
+            ${visitStats ? `
+            <div class="visit-section">
+                <h3>网站浏览统计</h3>
+                <div class="visit-stats-grid">
+                    <div class="visit-card">
+                        <div class="visit-value">${visitStats.todayPV}</div>
+                        <div class="visit-label">今日 PV</div>
+                        <div class="visit-sub">昨日 ${visitStats.yesterdayPV}</div>
+                    </div>
+                    <div class="visit-card">
+                        <div class="visit-value">${visitStats.todayUV}</div>
+                        <div class="visit-label">今日 UV</div>
+                        <div class="visit-sub">昨日 ${visitStats.yesterdayUV}</div>
+                    </div>
+                    <div class="visit-card">
+                        <div class="visit-value">${visitStats.totalPV}</div>
+                        <div class="visit-label">累计 PV</div>
+                        <div class="visit-sub">总访问量</div>
+                    </div>
+                    <div class="visit-card">
+                        <div class="visit-value">${visitStats.trend ? visitStats.trend[6] ? visitStats.trend[6].pv : '-' : '-'}</div>
+                        <div class="visit-label">昨日 PV</div>
+                        <div class="visit-sub">近7日趋势</div>
+                    </div>
+                </div>
+                <div class="visit-chart-wrap">
+                    <canvas id="visitChart"></canvas>
+                </div>
+            </div>` : ''}
             <div class="stats-grid">
                 ${Object.entries(stats).map(([k, v]) => `
                     <div class="stat-card" data-page="${k}" style="cursor:pointer">
@@ -407,6 +491,9 @@ const app = {
         main.querySelectorAll('.stat-card').forEach(el => {
             el.onclick = () => { location.hash = el.dataset.page; };
         });
+        if (visitStats && visitStats.trend) {
+            this.drawVisitChart('visitChart', visitStats.trend);
+        }
     },
 
     async renderEntityList(main, entity) {

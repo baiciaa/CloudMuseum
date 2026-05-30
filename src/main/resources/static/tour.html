@@ -94,6 +94,118 @@
             text-shadow: 0 1px 4px rgba(0,0,0,0.5);
         }
 
+        /* ========== 登州小吏 浮动按钮 ========== */
+        .tour-digital-human {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            z-index: 20;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .tour-digital-human:hover {
+            transform: scale(1.05);
+        }
+        .tour-dh-container {
+            width: 100px;
+            height: 140px;
+            pointer-events: none;
+            position: relative;
+        }
+        .tour-dh-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+            display: block;
+        }
+        .tour-dh-fallback {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(ellipse at center, rgba(196,162,101,0.08) 0%, transparent 70%);
+            border-radius: 50% 50% 40% 40%;
+            opacity: 1;
+            transition: opacity 0.5s;
+        }
+        .tour-dh-fallback .icon {
+            font-size: 40px;
+            line-height: 1;
+            filter: drop-shadow(0 2px 8px rgba(196,162,101,0.3));
+        }
+        .tour-dh-fallback .ring {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 1px solid rgba(196,162,101,0.15);
+            animation: pulse-ring 3s ease-in-out infinite;
+        }
+        @keyframes pulse-ring {
+            0%, 100% { transform: scale(0.9); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.6; }
+        }
+        .tour-dh-fallback.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .tour-dh-label {
+            text-align: center;
+            font-size: 11px;
+            color: var(--gold);
+            letter-spacing: 2px;
+            margin-top: -2px;
+            text-shadow: 0 1px 6px rgba(0,0,0,0.8);
+            pointer-events: none;
+            font-family: var(--font-display);
+        }
+
+        /* ========== 登州小吏 气泡提示 ========== */
+        .tour-dh-tooltip {
+            position: fixed;
+            bottom: 230px;
+            right: 30px;
+            z-index: 20;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(196,162,101,0.3);
+            border-radius: 8px;
+            padding: 14px 18px;
+            max-width: 260px;
+            color: rgba(255,255,255,0.9);
+            font-size: 13px;
+            line-height: 1.6;
+            font-family: var(--font-body);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none;
+        }
+        .tour-dh-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: 40px;
+            width: 0; height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid rgba(0,0,0,0.75);
+        }
+        .tour-dh-tooltip.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .tour-dh-tooltip .close-hint {
+            display: block;
+            margin-top: 8px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 1px;
+        }
+
         @media (max-width: 768px) {
             .tour-header .museum-title {
                 font-size: 13px;
@@ -102,6 +214,21 @@
             .hint-text {
                 font-size: 10px;
                 bottom: 20px;
+            }
+            .tour-digital-human {
+                bottom: 60px;
+                right: 10px;
+            }
+            .tour-dh-container {
+                width: 70px;
+                height: 100px;
+            }
+            .tour-dh-fallback .icon { font-size: 30px; }
+            .tour-dh-fallback .ring { width: 56px; height: 56px; }
+            .tour-dh-tooltip {
+                right: 10px;
+                max-width: 200px;
+                font-size: 12px;
             }
         }
     </style>
@@ -125,17 +252,173 @@
 
     <div class="hint-text">&#x1f5b1; 鼠标拖拽旋转视角 &nbsp;|&nbsp; W/A/S/D 移动 &nbsp;|&nbsp; 点击画面锁定鼠标</div>
 
-    <script>
-        function goBack() {
-            window.location.href = '/index.html';
-        }
+    <!-- 登州小吏 浮动按钮 -->
+    <div class="tour-digital-human" id="tourDigitalHuman" title="登州小吏">
+        <div class="tour-dh-container" id="dhContainer">
+            <!-- 兜底图标（Three.js 加载成功前显示） -->
+            <div class="tour-dh-fallback" id="dhFallback">
+                <div class="ring"></div>
+                <span class="icon">&#x1f9d9;</span>
+            </div>
+        </div>
+        <div class="tour-dh-label">登州小吏</div>
+    </div>
 
+    <!-- 登州小吏 气泡 -->
+    <div class="tour-dh-tooltip" id="dhTooltip">
+        在下登州小吏，云端导览使。<br>
+        此间乃登州博物馆名人厅，<br>
+        请君随意游览。
+        <span class="close-hint">点击小吏关闭提示</span>
+    </div>
+
+    <script>
+        // 全局返回函数
+        window.goBack = function() { window.location.href = '/index.html'; };
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' || e.key === 'Backspace') {
                 e.preventDefault();
-                goBack();
+                window.goBack();
             }
         });
+
+        // ===== 登州小吏（Three.js 版，CDN 加载失败自动降级为静态图标） =====
+        (function() {
+            const container = document.getElementById('dhContainer');
+            const btn = document.getElementById('tourDigitalHuman');
+            const tooltip = document.getElementById('dhTooltip');
+            const fallback = document.getElementById('dhFallback');
+
+            // 尝试用动态 import 加载 Three.js
+            function tryLoadThree() {
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.textContent = `
+                    import * as THREE from 'https://unpkg.com/three@0.184.0/build/three.module.js';
+                    import { GLTFLoader } from 'https://unpkg.com/three@0.184.0/examples/jsm/loaders/GLTFLoader.js';
+
+                    const MODEL_URL = '/uploads/3f65fbff0db10bc893ee4c058a028ed9.glb';
+                    const cont = document.getElementById('dhContainer');
+                    const fb = document.getElementById('dhFallback');
+
+                    function initDigitalHuman(c) {
+                        const w = c.clientWidth || 100;
+                        const h = c.clientHeight || 140;
+                        const scene = new THREE.Scene();
+                        const camera = new THREE.PerspectiveCamera(35, w / h, 0.1, 100);
+                        camera.position.set(0, 1.4, 2.8);
+                        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                        renderer.setSize(w, h);
+                        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                        renderer.setClearColor(0x000000, 0);
+                        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+                        renderer.toneMappingExposure = 1.2;
+                        c.appendChild(renderer.domElement);
+
+                        const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+                        scene.add(ambient);
+                        const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+                        keyLight.position.set(3, 4, 4);
+                        scene.add(keyLight);
+                        const fillLight = new THREE.DirectionalLight(0xffeedd, 0.6);
+                        fillLight.position.set(-2, 1, 2);
+                        scene.add(fillLight);
+                        const rimLight = new THREE.DirectionalLight(0xffffff, 0.6);
+                        rimLight.position.set(0, 1, -3);
+                        scene.add(rimLight);
+
+                        const loader = new GLTFLoader();
+                        let modelGroup = null;
+                        let mixer = null;
+                        let modelHeight = 1;
+
+                        loader.load(MODEL_URL, (gltf) => {
+                            modelGroup = gltf.scene;
+                            scene.add(modelGroup);
+                            const box = new THREE.Box3().setFromObject(modelGroup);
+                            const center = box.getCenter(new THREE.Vector3());
+                            const size = box.getSize(new THREE.Vector3());
+                            modelGroup.position.sub(center);
+                            modelHeight = size.y;
+                            const targetHeight = 1.6;
+                            const scale = targetHeight / size.y;
+                            modelGroup.scale.set(scale, scale, scale);
+                            modelGroup.position.y += targetHeight / 2;
+                            camera.position.set(0, targetHeight * 0.92, targetHeight * 1.3);
+                            camera.lookAt(0, targetHeight * 0.88, 0);
+                            if (gltf.animations && gltf.animations.length > 0) {
+                                mixer = new THREE.AnimationMixer(modelGroup);
+                                const action = mixer.clipAction(gltf.animations[0]);
+                                action.play();
+                            }
+                            // 3D 加载成功，隐藏 fallback
+                            if (fb) fb.classList.add('hidden');
+                        }, undefined, (err) => {
+                            console.error('数字人加载失败:', err);
+                        });
+
+                        let time = 0;
+                        function animate() {
+                            requestAnimationFrame(animate);
+                            time += 0.016;
+                            if (modelGroup) {
+                                modelGroup.rotation.y = -0.4;
+                                modelGroup.position.y = (modelHeight * 0.5) / (1.8 / modelHeight * 1.6) + Math.sin(time * 1.2) * 0.02;
+                            }
+                            if (mixer) mixer.update(0.016);
+                            renderer.render(scene, camera);
+                        }
+                        animate();
+
+                        const ro = new ResizeObserver(function() {
+                            const cw = c.clientWidth;
+                            const ch = c.clientHeight;
+                            if (cw > 0 && ch > 0) {
+                                camera.aspect = cw / ch;
+                                camera.updateProjectionMatrix();
+                                renderer.setSize(cw, ch);
+                            }
+                        });
+                        ro.observe(c);
+                    }
+
+                    try { initDigitalHuman(cont); } catch(e) { console.error('3D数字人初始化失败:', e); }
+                `;
+                document.body.appendChild(script);
+            }
+
+            tryLoadThree();
+
+            // ===== 点击交互 =====
+            let tooltipVisible = true;
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                tooltipVisible = !tooltipVisible;
+                tooltip.classList.toggle('visible', tooltipVisible);
+            });
+            setTimeout(function() { tooltip.classList.add('visible'); }, 1000);
+            setTimeout(function() {
+                tooltip.classList.remove('visible');
+                tooltipVisible = false;
+            }, 8000);
+
+            document.addEventListener('click', function(e) {
+                if (!btn.contains(e.target) && !tooltip.contains(e.target)) {
+                    tooltip.classList.remove('visible');
+                    tooltipVisible = false;
+                }
+            });
+        })();
+
+        // ===== 网站浏览统计 =====
+        (function() {
+            fetch('/api/visits/track', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pagePath: '/tour.html' }),
+                keepalive: true
+            }).catch(function(){});
+        })();
     </script>
 </body>
 </html>
