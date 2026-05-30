@@ -26,28 +26,29 @@
     <!-- ==================== 主内容区 ==================== -->
     <main class="main-content">
 
-        <!-- ========== S1: 首页 Hero ========== -->
-        <section id="section-home" class="section section-hero">
-            <!-- 背景图轮播层（JS动态填充 / 无图时CSS渐变fallback） -->
-            <div class="hero-bg-slideshow" id="heroBgSlideshow"></div>
-            <div class="hero-particles">
-                <div class="particle"></div><div class="particle"></div><div class="particle"></div>
-                <div class="particle"></div><div class="particle"></div><div class="particle"></div>
-                <div class="particle"></div><div class="particle"></div><div class="particle"></div>
-                <div class="particle"></div>
+        <!-- ========== S1: 首页 Hero（360°全景VR） ========== -->
+        <section id="section-home" class="section section-pano">
+            <!-- 加载动画 -->
+            <div id="pano-loading" class="pano-loading">
+                <div class="pano-spinner"></div>
+                <div class="pano-loader-text" id="pano-loader-text">加载场景...</div>
             </div>
-            <div class="hero-content">
-                <p class="hero-subtitle">DENGZHOU MUSEUM</p>
-                <h1 class="hero-title neon-text">登州博物馆</h1>
-                <p class="hero-desc">
-                    云端漫游 · 穿越千年的古港记忆
-                </p>
-                <div class="hero-actions">
-                    <button class="btn-primary btn-ripple" onclick="window.location.href='/tour.html'">
-                        进入漫游 ENTER
-                    </button>
-                </div>
+            <!-- Three.js 渲染容器 -->
+            <div id="pano-container"></div>
+            <!-- 全景UI覆盖层 -->
+            <div class="pano-header">
+                <span class="pano-logo">⛩️ 蓬莱阁</span>
+                <button class="pano-fs-btn" id="pano-fs-btn" title="全屏">⛶</button>
             </div>
+            <div class="pano-info">
+                <div class="pano-scene-name" id="pano-scene-name">蓬莱阁</div>
+                <div class="pano-scene-cat" id="pano-scene-cat">古建筑群</div>
+            </div>
+            <div class="pano-nav-btns">
+                <button class="pano-nav-btn" id="pano-prev">‹</button>
+                <button class="pano-nav-btn" id="pano-next">›</button>
+            </div>
+            <div class="pano-scene-bar" id="pano-scene-bar"></div>
         </section>
 
         <!-- ========== S2: 馆舍概况 ========== -->

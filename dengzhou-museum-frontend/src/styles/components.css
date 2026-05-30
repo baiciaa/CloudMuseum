@@ -11,6 +11,11 @@
     display: flex;
     flex-direction: column;
     padding: 40px 0;
+    transform: translateX(-100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.side-nav.visible {
+    transform: translateX(0);
 }
 
 .nav-logo {
@@ -80,12 +85,12 @@
 /* 左侧：红柱分隔线 (导航与内容之间) */
 .side-nav::after {
     content: '';
-    position: fixed;
+    position: absolute;
     top: 0;
-    left: calc(var(--nav-width) - 12px);
+    left: 100%;
     width: 14px;
     height: 100vh;
-    z-index: 999;
+    z-index: 1000;
     pointer-events: none;
     background:
         linear-gradient(90deg,

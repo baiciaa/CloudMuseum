@@ -7,18 +7,11 @@ import './styles/animations.css';
 import { articleApi, relicApi, courseApi, reservationApi, announcementApi, recruitmentApi } from './api/index.js';
 import { IMAGES } from './config/images.js';
 import { initDigitalHuman } from './three/DigitalHuman.js';
+import { createPanorama } from './three/Panorama.js';
 
 // ==================== 图片初始化 ====================
 
 function initImages() {
-  // Hero 背景轮播
-  const slideshow = document.getElementById('heroBgSlideshow');
-  if (slideshow && IMAGES.heroSlides.length > 0) {
-    slideshow.innerHTML = IMAGES.heroSlides.map((url, i) =>
-      `<div class="hero-bg-slide" style="background-image:url('${url}');"></div>`
-    ).join('');
-  }
-
   // 云端漫游入口背景
   if (IMAGES.exploreCover) {
     const entranceBg = document.querySelector('.tour-entrance-bg');
@@ -55,13 +48,23 @@ function initNavigation() {
   });
 }
 
-// 滚动监听：自动更新导航激活项
+// 滚动监听：导航栏滑入/滑出 & 自动高亮
 function initScrollSpy() {
+  const sideNav = document.querySelector('.side-nav');
   const floatBtn = document.querySelector('.float-dengzhou');
-  window.addEventListener('scroll', () => {
+  const heroSection = document.getElementById('section-home');
+
+  function updateNav() {
+    const heroBottom = heroSection?.offsetTop + (heroSection?.offsetHeight || window.innerHeight);
+    const scrolledPastHero = window.scrollY >= heroBottom - 100;
+
+    // 导航栏：在 Hero 时隐藏，滑出 Hero 时从左滑入
+    sideNav?.classList.toggle('visible', scrolledPastHero);
+
+    // 导航项高亮
     const sections = document.querySelectorAll('.section');
     const navItems = document.querySelectorAll('.nav-item');
-    let current = 'home';
+    let current = scrolledPastHero ? 'home' : '';
     sections.forEach(section => {
       if (window.scrollY >= section.offsetTop - 100) {
         current = section.id.replace('section-', '');
@@ -69,17 +72,20 @@ function initScrollSpy() {
     });
     navItems.forEach(item => {
       item.classList.remove('active');
-      if (item.getAttribute('data-section') === current) {
+      if (scrolledPastHero && item.getAttribute('data-section') === current) {
         item.classList.add('active');
       }
     });
-    // 划出首页时显示数字人，在首页时隐藏
+
+    // 数字人：只在非 Hero 时显示
     if (floatBtn) {
-      floatBtn.classList.toggle('hidden', current === 'home');
+      floatBtn.classList.toggle('hidden', !scrolledPastHero);
     }
-  });
-  // 初始状态隐藏
-  if (floatBtn) floatBtn.classList.add('hidden');
+  }
+
+  window.addEventListener('scroll', updateNav);
+  // 初始：Hero 可见 → 导航隐藏
+  updateNav();
 }
 
 // ==================== 动态内容加载 ====================
@@ -870,7 +876,55 @@ ${historyStr}
 // ==================== 页面初始化 ====================
 
 document.addEventListener('DOMContentLoaded', async () => {
-  initImages();
+  // 初始化 360° 全景 VR
+  let panorama;
+  const panoContainer = document.getElementById('pano-container');
+  if (panoContainer) {
+    const loading = document.getElementById('pano-loading');
+    const loaderText = document.getElementById('pano-loader-text');
+    const sceneName = document.getElementById('pano-scene-name');
+    const sceneCat = document.getElementById('pano-scene-cat');
+    const sceneBar = document.getElementById('pano-scene-bar');
+
+    panorama = createPanorama(panoContainer, {
+      setLoading: (v) => loading?.classList.toggle('hidden', !v),
+      setLoadingText: (t) => { if (loaderText) loaderText.textContent = t; },
+      setSceneInfo: (sd, cat) => {
+        if (sceneName) sceneName.textContent = sd.name;
+        if (sceneCat) sceneCat.textContent = cat;
+      },
+      setScenes: (list) => {
+        if (!sceneBar) return;
+        sceneBar.innerHTML = list.map((s, i) =>
+          `<span class="pano-scene-dot" data-idx="${i}">${s.name}</span>`
+        ).join('');
+        sceneBar.querySelectorAll('.pano-scene-dot').forEach(el => {
+          el.addEventListener('click', () => {
+            panorama?.goTo(parseInt(el.dataset.idx));
+            sceneBar.querySelectorAll('.pano-scene-dot').forEach(d => d.classList.remove('active'));
+            el.classList.add('active');
+          });
+        });
+      },
+    });
+
+    // 全屏按钮
+    document.getElementById('pano-fs-btn')?.addEventListener('click', () => {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    });
+
+    // 场景切换按钮
+    document.getElementById('pano-prev')?.addEventListener('click', () => panorama?.prev());
+    document.getElementById('pano-next')?.addEventListener('click', () => panorama?.next());
+
+    // 键盘快捷键
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight') panorama?.next();
+      if (e.key === 'ArrowLeft') panorama?.prev();
+    });
+  }
+
   // 启动 3D 数字人
   requestAnimationFrame(() => {
     const container = document.getElementById('digitalHumanContainer');

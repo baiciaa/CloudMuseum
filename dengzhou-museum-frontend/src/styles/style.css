@@ -78,133 +78,195 @@ img { max-width: 100%; height: auto; display: block; }
 ::-webkit-scrollbar-track { background: var(--bg-section); }
 ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
 
-/* ==================== 首页 Hero ==================== */
-.section-hero {
+/* ==================== 首页 Hero（360°全景替换） ==================== */
+.section-pano {
     position: relative;
-    min-height: 100vh;
+    width: 100vw;
+    height: 100vh;
+    margin-left: calc(-1 * (var(--nav-width) - 12px + 14px) - 40px);
+    padding: 0 !important;
+    overflow: hidden;
+    border-bottom: none !important;
+    flex-shrink: 0;
+    background: #0a0a0f;
+}
+
+/* 加载动画 */
+.pano-loading {
+    position: absolute;
+    inset: 0;
+    background: #0a0a0f;
     display: flex;
     align-items: center;
     justify-content: center;
-    /* overflow: hidden 已移除，让背景图穿透到边缘 */
-    /* fallback：无背景图时显示增强渐变 */
-    background:
-        radial-gradient(ellipse at 25% 15%, rgba(196,162,101,0.12) 0%, transparent 55%),
-        radial-gradient(ellipse at 75% 85%, rgba(173,58,47,0.06) 0%, transparent 55%),
-        radial-gradient(ellipse at 60% 40%, rgba(91,160,184,0.04) 0%, transparent 50%),
-        linear-gradient(180deg, #fdfaf5 0%, #f7f0e0 50%, #fdfaf5 100%);
+    z-index: 10;
+    transition: opacity 0.8s;
 }
-
-/* === 背景图轮播层 — 全宽延伸到页面边缘 === */
-.hero-bg-slideshow {
-    position: absolute;
-    top: 0;
-    left: calc(-1 * (var(--nav-width) - 12px + 14px + 40px));
-    width: 100vw;
-    height: 100%;
-    z-index: 0;
-}
-.hero-bg-slideshow:empty {
-    display: none; /* 无图片时隐藏，显示CSS渐变fallback */
-}
-.hero-bg-slide {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+.pano-loading.hidden {
     opacity: 0;
-    transform: scale(1);
-    animation: kenburnsZoom 24s ease-in-out infinite,
-               heroCrossfade 24s ease-in-out infinite;
+    pointer-events: none;
 }
-.hero-bg-slide:nth-child(1) { animation-delay: 0s, 0s; }
-.hero-bg-slide:nth-child(2) { animation-delay: 0s, 8s; }
-.hero-bg-slide:nth-child(3) { animation-delay: 0s, 16s; }
-/* 单张图时静态显示（不缩放） */
-.hero-bg-slide:only-child,
-.hero-bg-slide:nth-child(1):last-child {
-    opacity: 1;
-    animation: none;
+.pano-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(200,164,92,.15);
+    border-top-color: #c8a45c;
+    border-radius: 50%;
+    animation: panoSpin 1s linear infinite;
+    position: absolute;
+}
+@keyframes panoSpin { to { transform: rotate(360deg) } }
+.pano-loader-text {
+    font-size: 14px;
+    color: rgba(232,224,208,.5);
+    letter-spacing: 2px;
+    margin-top: 70px;
 }
 
-/* 金色粒子 */
-.hero-particles {
+/* Three.js 渲染容器 */
+#pano-container {
     position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
+    inset: 0;
     z-index: 1;
 }
+#pano-container canvas { display: block; }
 
-.particle {
+/* 全景头部 */
+.pano-header {
     position: absolute;
-    width: 3px; height: 3px;
-    background: var(--gold);
-    border-radius: 50%;
-    opacity: 0;
-    animation: particleFloat 6s ease-in-out infinite;
-}
-.particle:nth-child(1)  { left: 10%; top: 60%; animation-delay: 0s; }
-.particle:nth-child(2)  { left: 20%; top: 30%; animation-delay: 0.8s; width: 2px; height: 2px; }
-.particle:nth-child(3)  { left: 35%; top: 70%; animation-delay: 1.6s; }
-.particle:nth-child(4)  { left: 50%; top: 20%; animation-delay: 2.4s; width: 4px; height: 4px; }
-.particle:nth-child(5)  { left: 65%; top: 55%; animation-delay: 3.2s; width: 2px; height: 2px; }
-.particle:nth-child(6)  { left: 75%; top: 35%; animation-delay: 4.0s; }
-.particle:nth-child(7)  { left: 85%; top: 65%; animation-delay: 4.8s; width: 2px; height: 2px; }
-.particle:nth-child(8)  { left: 15%; top: 80%; animation-delay: 1.2s; }
-.particle:nth-child(9)  { left: 55%; top: 85%; animation-delay: 3.6s; width: 3px; height: 3px; }
-.particle:nth-child(10) { left: 90%; top: 15%; animation-delay: 5.2s; width: 2px; height: 2px; }
-
-@keyframes particleFloat {
-    0%   { opacity: 0; transform: translateY(0) translateX(0); }
-    20%  { opacity: 0.7; }
-    50%  { opacity: 0.3; transform: translateY(-60px) translateX(20px); }
-    80%  { opacity: 0.7; }
-    100% { opacity: 0; transform: translateY(-120px) translateX(-10px); }
-}
-
-.hero-content {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-    margin-top: -360px;
-}
-
-.hero-title {
-    font-family: var(--font-display);
-    font-size: clamp(48px, 9vw, 100px);
-    letter-spacing: 10px;
-    color: #ffffff;
-    text-shadow: 0 2px 16px rgba(0,0,0,0.5), 0 4px 32px rgba(0,0,0,0.3);
-    margin-bottom: 8px;
-}
-
-.hero-subtitle {
-    font-family: var(--font-display);
-    font-size: clamp(14px, 2vw, 18px);
-    letter-spacing: 6px;
-    color: #fff;
-    mix-blend-mode: difference;
-    margin-bottom: 32px;
-}
-
-.hero-desc {
-    color: #fff;
-    font-size: clamp(16px, 2.2vw, 22px);
-    margin: 24px 0 40px;
-    line-height: 1.8;
-    mix-blend-mode: difference;
-}
-
-.hero-actions {
+    top: 0; left: 0; right: 0;
+    height: 56px;
     display: flex;
-    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    background: linear-gradient(180deg, rgba(0,0,0,.7), transparent);
+    z-index: 5;
+    pointer-events: none;
+}
+.pano-header > * { pointer-events: auto; }
+.pano-logo {
+    color: #c8a45c;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+.pano-fs-btn {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
+    color: #e8e0d0;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
     justify-content: center;
-    flex-wrap: wrap;
+    cursor: pointer;
+    transition: .3s;
+    font-size: 16px;
+}
+.pano-fs-btn:hover {
+    background: rgba(200,164,92,.2);
+    border-color: #c8a45c;
+    color: #c8a45c;
 }
 
-/* 按钮波纹 */
+/* 场景信息 */
+.pano-info {
+    position: absolute;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 5;
+    pointer-events: none;
+}
+.pano-scene-name {
+    font-size: 20px;
+    font-weight: 600;
+    color: #e8e0d0;
+    text-shadow: 0 2px 8px rgba(0,0,0,.6);
+    letter-spacing: 2px;
+}
+.pano-scene-cat {
+    font-size: 12px;
+    color: #c8a45c;
+    margin-top: 4px;
+    text-shadow: 0 1px 4px rgba(0,0,0,.5);
+    letter-spacing: 1px;
+}
+
+/* 导航按钮 */
+.pano-nav-btns {
+    position: absolute;
+    bottom: 150px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 16px;
+    z-index: 5;
+}
+.pano-nav-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(0,0,0,.5);
+    border: 1px solid rgba(255,255,255,.15);
+    color: #e8e0d0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: .3s;
+    backdrop-filter: blur(8px);
+    font-size: 18px;
+}
+.pano-nav-btn:hover {
+    background: rgba(200,164,92,.2);
+    border-color: #c8a45c;
+    color: #c8a45c;
+    transform: scale(1.05);
+}
+
+/* 场景选择栏 */
+.pano-scene-bar {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 5;
+    background: rgba(0,0,0,.5);
+    backdrop-filter: blur(12px);
+    padding: 4px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,.1);
+}
+.pano-scene-dot {
+    padding: 8px 20px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: .3s;
+    font-size: 13px;
+    color: rgba(232,224,208,.5);
+    white-space: nowrap;
+}
+.pano-scene-dot:hover {
+    background: rgba(255,255,255,.08);
+    color: #e8e0d0;
+}
+.pano-scene-dot.active {
+    background: rgba(200,164,92,.25);
+    color: #c8a45c;
+}
+
+@media(max-width:768px) {
+    .pano-info .pano-scene-name { font-size: 16px; }
+    .pano-scene-dot { font-size: 12px; }
+}
+
+/* 按钮波纹（用于其他页面按钮） */
 .btn-ripple {
     position: relative;
     overflow: hidden;

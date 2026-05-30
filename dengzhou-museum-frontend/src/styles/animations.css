@@ -55,26 +55,6 @@
     100% { width: 200px; height: 200px; opacity: 0; }
 }
 
-/* ========== Hero 背景轮播-Ken Burns 缩放 ========== */
-@keyframes kenburnsZoom {
-    0%   { transform: scale(1); }
-    50%  { transform: scale(1.08); }
-    100% { transform: scale(1); }
-}
-
-/* ========== Hero 图片交叉淡入淡出 ========== */
-@keyframes heroCrossfade {
-    0%, 29%   { opacity: 0; }
-    33%, 62%  { opacity: 1; }
-    66%, 100% { opacity: 0; }
-}
-
-/* ========== 视差滚动 - 背景图偏移 ========== */
-@keyframes parallaxScroll {
-    from { transform: translateY(0); }
-    to { transform: translateY(-15%); }
-}
-
 /* ========== 云纹浮动 ========== */
 @keyframes cloudFloat {
     0%   { transform: translateX(0) translateY(0); opacity: 0.3; }
