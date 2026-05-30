@@ -101,6 +101,37 @@ CREATE TABLE IF NOT EXISTS announcements (
     INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='资讯公告/研学宣传表';
 
+-- ========== 招募报名表 ==========
+CREATE TABLE IF NOT EXISTS recruitments (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(64) NOT NULL COMMENT '姓名',
+    phone VARCHAR(20) NOT NULL COMMENT '手机号',
+    email VARCHAR(128) DEFAULT NULL COMMENT '邮箱',
+    age INT DEFAULT NULL COMMENT '年龄',
+    school VARCHAR(256) DEFAULT NULL COMMENT '学校/单位',
+    intro TEXT COMMENT '申请理由/简介',
+    type VARCHAR(16) NOT NULL COMMENT 'VOLUNTEER / ACTIVITY',
+    status VARCHAR(16) NOT NULL DEFAULT 'PENDING' COMMENT 'PENDING / APPROVED / REJECTED',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_type (type),
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='招募报名表';
+
+-- ========== 网站访问统计表 ==========
+CREATE TABLE IF NOT EXISTS site_visits (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    page_path VARCHAR(256) NOT NULL DEFAULT '/' COMMENT '页面路径',
+    visit_date DATE NOT NULL COMMENT '访问日期',
+    pv_count INT NOT NULL DEFAULT 0 COMMENT '访问次数(PV)',
+    uv_count INT NOT NULL DEFAULT 0 COMMENT '独立访客数(UV)',
+    ip_addresses TEXT COMMENT 'IP地址集合(逗号分隔)',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_page_date (page_path, visit_date),
+    INDEX idx_visit_date (visit_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='网站访问统计表';
+
 -- ========== 初始管理员账号 ==========
 -- 密码 "admin123" 的 BCrypt 哈希
 INSERT INTO users (username, password, role) VALUES

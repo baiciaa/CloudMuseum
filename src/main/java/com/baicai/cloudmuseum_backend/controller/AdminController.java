@@ -31,6 +31,8 @@ public class AdminController {
     private AnnouncementService announcementService;
     @Autowired
     private RecruitmentService recruitmentService;
+    @Autowired
+    private SiteVisitService siteVisitService;
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
@@ -101,6 +103,11 @@ public class AdminController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String status) {
         return ApiResponse.ok(announcementService.getAll(type, status));
+    }
+
+    @GetMapping("/visits/stats")
+    public ApiResponse<Map<String, Object>> visitStats() {
+        return ApiResponse.ok(siteVisitService.getVisitStats());
     }
 
     /** 管理端课程列表（含已下架） */
