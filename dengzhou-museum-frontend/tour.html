@@ -47,7 +47,6 @@
             z-index: 10;
             pointer-events: none;
         }
-
         .tour-header > * { pointer-events: auto; }
 
         .tour-header .back-btn {
@@ -65,13 +64,11 @@
             border-radius: 2px;
             transition: all 0.3s;
         }
-
         .tour-header .back-btn:hover {
             background: rgba(196, 162, 101, 0.3);
             border-color: var(--gold);
             color: var(--gold);
         }
-
         .tour-header .museum-title {
             font-family: var(--font-display);
             font-size: 16px;
@@ -94,15 +91,121 @@
             text-shadow: 0 1px 4px rgba(0,0,0,0.5);
         }
 
+        /* ========== 登州小吏 浮动按钮 ========== */
+        .tour-digital-human {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            z-index: 20;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .tour-digital-human:hover { transform: scale(1.05); }
+        .tour-dh-container {
+            width: 100px;
+            height: 140px;
+            pointer-events: none;
+            position: relative;
+        }
+        .tour-dh-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+            display: block;
+        }
+        .tour-dh-fallback {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(ellipse at center, rgba(196,162,101,0.08) 0%, transparent 70%);
+            border-radius: 50% 50% 40% 40%;
+            opacity: 1;
+            transition: opacity 0.5s;
+        }
+        .tour-dh-fallback .icon {
+            font-size: 40px;
+            line-height: 1;
+            filter: drop-shadow(0 2px 8px rgba(196,162,101,0.3));
+        }
+        .tour-dh-fallback .ring {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 1px solid rgba(196,162,101,0.15);
+            animation: pulse-ring 3s ease-in-out infinite;
+        }
+        @keyframes pulse-ring {
+            0%, 100% { transform: scale(0.9); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.6; }
+        }
+        .tour-dh-fallback.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .tour-dh-label {
+            text-align: center;
+            font-size: 11px;
+            color: var(--gold);
+            letter-spacing: 2px;
+            margin-top: -2px;
+            text-shadow: 0 1px 6px rgba(0,0,0,0.8);
+            pointer-events: none;
+            font-family: var(--font-display);
+        }
+
+        /* ========== 登州小吏 气泡提示 ========== */
+        .tour-dh-tooltip {
+            position: fixed;
+            bottom: 230px;
+            right: 30px;
+            z-index: 20;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(196,162,101,0.3);
+            border-radius: 8px;
+            padding: 14px 18px;
+            max-width: 260px;
+            color: rgba(255,255,255,0.9);
+            font-size: 13px;
+            line-height: 1.6;
+            font-family: var(--font-body);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none;
+        }
+        .tour-dh-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: 40px;
+            width: 0; height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid rgba(0,0,0,0.75);
+        }
+        .tour-dh-tooltip.visible { opacity: 1; transform: translateY(0); }
+        .tour-dh-tooltip .close-hint {
+            display: block;
+            margin-top: 8px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 1px;
+        }
+
         @media (max-width: 768px) {
-            .tour-header .museum-title {
-                font-size: 13px;
-                letter-spacing: 2px;
-            }
-            .hint-text {
-                font-size: 10px;
-                bottom: 20px;
-            }
+            .tour-header .museum-title { font-size: 13px; letter-spacing: 2px; }
+            .hint-text { font-size: 10px; bottom: 20px; }
+            .tour-digital-human { bottom: 60px; right: 10px; }
+            .tour-dh-container { width: 70px; height: 100px; }
+            .tour-dh-fallback .icon { font-size: 30px; }
+            .tour-dh-fallback .ring { width: 56px; height: 56px; }
+            .tour-dh-tooltip { right: 10px; max-width: 200px; font-size: 12px; }
         }
     </style>
 </head>
@@ -125,17 +228,91 @@
 
     <div class="hint-text">&#x1f5b1; 鼠标拖拽旋转视角 &nbsp;|&nbsp; W/A/S/D 移动 &nbsp;|&nbsp; 点击画面锁定鼠标</div>
 
-    <script>
-        function goBack() {
-            window.location.href = '/index.html';
-        }
+    <!-- 登州小吏 浮动按钮 -->
+    <div class="tour-digital-human" id="tourDigitalHuman" title="登州小吏">
+        <div class="tour-dh-container" id="dhContainer">
+            <div class="tour-dh-fallback" id="dhFallback">
+                <div class="ring"></div>
+                <span class="icon">&#x1f9d9;</span>
+            </div>
+        </div>
+        <div class="tour-dh-label">登州小吏</div>
+    </div>
 
+    <!-- 登州小吏 气泡 -->
+    <div class="tour-dh-tooltip" id="dhTooltip">
+        在下登州小吏，云端导览使。<br>
+        此间乃登州博物馆名人厅，<br>
+        请君随意游览。
+        <span class="close-hint">点击小吏关闭提示</span>
+    </div>
+
+    <script>
+        window.goBack = function() { window.location.href = '/'; };
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' || e.key === 'Backspace') {
                 e.preventDefault();
-                goBack();
+                window.goBack();
             }
         });
+    </script>
+
+    <script type="module">
+        import { initDigitalHuman } from './src/three/DigitalHuman.js';
+
+        const container = document.getElementById('dhContainer');
+        const btn = document.getElementById('tourDigitalHuman');
+        const tooltip = document.getElementById('dhTooltip');
+        const fallback = document.getElementById('dhFallback');
+
+        if (container) {
+            try {
+                const dh = initDigitalHuman(container);
+                // 3D 初始化成功（至少 renderer 已创建），隐藏 fallback
+                // GLB 加载完成后，model-loaded class 会加到 container 上
+                const checkLoaded = setInterval(function() {
+                    if (container.classList.contains('model-loaded')) {
+                        if (fallback) fallback.classList.add('hidden');
+                        clearInterval(checkLoaded);
+                    }
+                    if (container.classList.contains('model-failed')) {
+                        clearInterval(checkLoaded);
+                    }
+                }, 500);
+            } catch(e) {
+                console.error('3D数字人初始化失败:', e);
+            }
+        }
+
+        // 点击交互
+        let tooltipVisible = true;
+        if (btn) {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                tooltipVisible = !tooltipVisible;
+                tooltip.classList.toggle('visible', tooltipVisible);
+            });
+        }
+        setTimeout(function() { tooltip.classList.add('visible'); }, 1000);
+        setTimeout(function() {
+            tooltip.classList.remove('visible');
+            tooltipVisible = false;
+        }, 8000);
+
+        document.addEventListener('click', function(e) {
+            if (!btn.contains(e.target) && !tooltip.contains(e.target)) {
+                tooltip.classList.remove('visible');
+                tooltipVisible = false;
+            }
+        });
+
+        // 网站浏览统计
+        fetch('/api/visits/track', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pagePath: '/tour.html' }),
+            keepalive: true
+        }).catch(function(){});
     </script>
 </body>
 </html>
