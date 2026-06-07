@@ -47,6 +47,15 @@ uploads/
 *.tmp
 application-local.properties
 
+### Maven Wrapper ###
+mvnw
+mvnw.cmd
+.mvn/
+
+### Start scripts ###
+dengzhou-museum-frontend/start-public.cmd
+dengzhou-museum-frontend/start-public.sh
+
 ### Build outputs ###
 src/main/resources/static/assets/
 
