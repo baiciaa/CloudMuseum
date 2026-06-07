@@ -1,0 +1,210 @@
+/* ==================== 导航栏 - 左侧固定 ==================== */
+.side-nav {
+    position: fixed;
+    left: 0; top: 0;
+    width: var(--nav-width);
+    height: 100vh;
+    background: rgba(253, 250, 245, 0.96);
+    backdrop-filter: blur(10px);
+    border-right: 1px solid var(--border-subtle);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    padding: 40px 0;
+}
+
+.nav-logo {
+    padding: 0 28px 40px;
+    border-bottom: 1px solid var(--border-subtle);
+    font-family: var(--font-display);
+    font-size: 16px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-align: center;
+    font-weight: 700;
+}
+
+.nav-menu {
+    list-style: none;
+    padding: 30px 0;
+    flex: 1;
+}
+
+.nav-item {
+    padding: 14px 28px;
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--text-secondary);
+    transition: all var(--transition-speed);
+    position: relative;
+    text-transform: uppercase;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    color: var(--gold);
+    background: rgba(196, 162, 101, 0.06);
+}
+
+.nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: var(--gold);
+    box-shadow: 0 0 8px rgba(196, 162, 101, 0.4);
+}
+
+/* ==================== 主内容区 ==================== */
+.main-content {
+    margin-left: var(--nav-width);
+    padding:0 40px;
+    overflow-x:hidden;
+    min-width:0;
+
+    }
+
+.section {
+    min-height: 100vh;
+    padding: var(--section-padding);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-bottom: 1px solid var(--border-subtle);
+    position: relative;
+}
+
+/* ==================== 卡片组件 ==================== */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 2px;
+    padding: 32px;
+    transition: all var(--transition-speed);
+    position: relative;
+    overflow: hidden;
+}
+
+.card:hover {
+    border-color: var(--border-glow);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(196, 162, 101, 0.08);
+}
+
+.card-title {
+    font-family: var(--font-display);
+    font-size: 15px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+/* ==================== 按钮组件 ==================== */
+.btn-primary {
+    display: inline-block;
+    padding: 12px 32px;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    position: relative;
+    overflow: hidden;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background: rgba(196, 162, 101, 0.08);
+    box-shadow: 0 0 16px rgba(196, 162, 101, 0.2);
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(196, 162, 101, 0.15), transparent);
+    transition: left 0.5s;
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+/* ==================== Unity容器预留 ==================== */
+#unity-container {
+    width: 100%;
+    height: 60vh;
+    border: 2px dashed var(--border-subtle);
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 14px;
+    color: var(--text-secondary);
+    letter-spacing: 2px;
+    position: relative;
+    overflow: hidden;
+}
+
+#unity-container canvas,
+#unity-container iframe {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* ==================== 文物卡片网格 ==================== */
+.relic-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+@media (max-width: 1400px) {
+    .relic-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 900px) {
+    .relic-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+    .relic-grid { grid-template-columns: 1fr; }
+}
+
+.relic-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 2px;
+    overflow: hidden;
+    transition: all var(--transition-speed);
+    cursor: pointer;
+}
+
+.relic-card:hover {
+    border-color: var(--border-glow);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(196, 162, 101, 0.1);
+}
+
+.relic-card .card-img {
+    width: 100%;
+    height: 220px;
+    background: #f5efe0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-size: 12px;
+    border-bottom: 1px solid var(--border-subtle);
+}

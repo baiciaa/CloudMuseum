@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登州博物馆 · 云端漫游 | DENGZHOU MUSEUM</title>
+
+    <!-- 样式引入 -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/animations.css">
+</head>
+<body>
+
+    <!-- ==================== 左侧导航栏 ==================== -->
+    <nav class="side-nav">
+        <div class="nav-logo">DENGZHOU<br>MUSEUM</div>
+        <ul class="nav-menu">
+            <li class="nav-item active" data-section="home">首页 HOME</li>
+            <li class="nav-item" data-section="history">历史背景 HISTORY</li>
+            <li class="nav-item" data-section="relics">重点文物 RELICS</li>
+            <li class="nav-item" data-section="tour">旅行攻略 TOUR</li>
+            <li class="nav-item" data-section="explore">云端漫游 EXPLORE</li>
+            <li class="nav-item" data-section="education">研学中心 EDU</li>
+        </ul>
+        <div class="nav-footer" style="padding:0 28px; font-size:10px; color:var(--text-secondary);">
+            © 2026 DENGZHOU MUSEUM
+        </div>
+    </nav>
+
+    <!-- ==================== 主内容区 ==================== -->
+    <main class="main-content">
+
+        <!-- ========== S1: 首页 ========== -->
+        <section id="section-home" class="section active">
+            <div class="hero-content">
+                <h1 class="hero-title neon-text" style="font-family:var(--font-display); font-size:clamp(36px, 6vw, 72px); letter-spacing:8px;">
+                    登州博物馆
+                </h1>
+                <p style="color:var(--text-secondary); font-size:16px; margin:24px 0 40px;">
+                    云端漫游 · 穿越千年的古港记忆<br>
+                    DENGZHOU MUSEUM — VIRTUAL TOUR
+                </p>
+                <div style="display:flex; gap:20px;">
+                    <button class="btn-primary" onclick="scrollToSection('explore')">
+                        进入漫游 ENTER
+                    </button>
+                    <button class="btn-primary" onclick="scrollToSection('tour')" style="border-color:var(--red-accent); color:var(--red-accent);">
+                        旅行攻略 PLAN
+                    </button>
+                </div>
+            </div>
+        </section>
+
+       <!-- ========== S2: 历史背景（动态版） ========== -->
+<section id="section-history" class="section">
+    <div class="section-header fade-in-up">
+        <span style="font-family:var(--font-display); font-size:12px; letter-spacing:4px; color:var(--gold);">HISTORY</span>
+        <h2 style="font-size:32px; margin-top:12px;">历史背景</h2>
+        <div style="width:60px; height:1px; background:var(--gold); margin:20px 0;"></div>
+    </div>
+    <div class="history-timeline" id="history-grid">
+        <!-- 由 JS 动态加载 -->
+        <p style="color:var(--text-secondary); text-align:center;">历史内容加载中...</p>
+    </div>
+</section>
+
+        <!-- ========== S3: 重点文物（动态版） ========== -->
+<section id="section-relics" class="section">
+    <div class="section-header fade-in-up">
+        <span style="font-family:var(--font-display); font-size:12px; letter-spacing:4px; color:var(--gold);">RELICS</span>
+        <h2 style="font-size:32px; margin-top:12px;">重点文物</h2>
+        <div style="width:60px; height:1px; background:var(--gold); margin:20px 0;"></div>
+    </div>
+    <div class="relic-grid fade-in-up delay-1" id="relic-grid" style="margin-top:40px;">
+        <!-- 由 JS 动态加载 -->
+        <p style="color:var(--text-secondary); grid-column:1/-1; text-align:center;">文物数据加载中...</p>
+    </div>
+</section>
+
+        <!-- ========== S4: 旅行攻略 ========== -->
+        <section id="section-tour" class="section">
+            <div class="section-header fade-in-up">
+                <span style="font-family:var(--font-display); font-size:12px; letter-spacing:4px; color:var(--neon-cyan);">TOUR</span>
+                <h2 style="font-size:32px; margin-top:12px;">智能旅行攻略</h2>
+                <div style="width:60px; height:1px; background:var(--neon-cyan); margin:20px 0;"></div>
+            </div>
+
+            <!-- 多维信息面板 -->
+            <div class="tour-panels fade-in-up delay-1" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-top:20px;">
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:32px; margin-bottom:8px;">📍</div>
+                    <div class="card-title" style="margin:0;">你的位置</div>
+                    <p id="user-location" style="color:var(--text-secondary); font-size:13px;">获取中...</p>
+                </div>
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:32px; margin-bottom:8px;">🌤️</div>
+                    <div class="card-title" style="margin:0;">实时天气</div>
+                    <p id="weather-info" style="color:var(--text-secondary); font-size:13px;">加载中...</p>
+                </div>
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:32px; margin-bottom:8px;">👥</div>
+                    <div class="card-title" style="margin:0;">人流量预测</div>
+                    <p id="crowd-info" style="color:var(--text-secondary); font-size:13px;">计算中...</p>
+                </div>
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:32px; margin-bottom:8px;">🎫</div>
+                    <div class="card-title" style="margin:0;">票务信息</div>
+                    <p style="color:var(--text-secondary); font-size:13px;">免费参观（需预约）</p>
+                </div>
+            </div>
+
+            <!-- AI攻略生成按钮与结果区 -->
+            <div class="fade-in-up delay-2" style="margin-top:30px; text-align:center;">
+                <button class="btn-primary" onclick="generateTourPlan()" style="font-size:14px; padding:16px 48px;">
+                    🤖 AI 生成出行攻略
+                </button>
+                <p style="color:var(--text-secondary); font-size:11px; margin-top:12px;">
+                    基于您的实时位置、天气、人流量等多维数据分析生成个性化攻略
+                </p>
+            </div>
+
+            <!-- AI攻略结果卡片 -->
+            <div id="ai-result" class="card fade-in-up delay-3" style="margin-top:30px; display:none;">
+                <div class="card-title">// AI_GENERATED_PLAN</div>
+                <div id="ai-result-content" style="color:var(--text-secondary); line-height:1.8;">
+                    <!-- AI生成的攻略内容将在此动态渲染 -->
+                </div>
+            </div>
+        </section>
+
+       <!-- ========== S5: 云端漫游 ========== -->
+<section id="section-explore" class="section">
+    <div class="section-header fade-in-up">
+        <span style="font-family:var(--font-display); font-size:12px; letter-spacing:4px; color:var(--gold);">EXPLORE</span>
+        <h2 style="font-size:32px; margin-top:12px;">云端漫游</h2>
+        <p style="color:var(--text-secondary); margin-top:8px;">720°全景 · 身临其境感受千年古港</p>
+        <div style="width:60px; height:1px; background:var(--gold); margin:20px 0;"></div>
+    </div>
+
+    <!-- 漫游主入口（单卡片，居中） -->
+    <div class="fade-in-up delay-1" style="max-width:600px; margin:40px auto 0;">
+        <div style="position:relative; border-radius:4px; overflow:hidden; border:2px solid var(--border-subtle); transition:all 0.4s; cursor:pointer;"
+             onmouseenter="this.style.borderColor='var(--border-glow)'; this.style.boxShadow='0 8px 32px rgba(196,162,101,0.2)';"
+             onmouseleave="this.style.borderColor='var(--border-subtle)'; this.style.boxShadow='none';"
+             onclick="enterMuseumTour()">
+            <!-- 博物馆外观图占位 -->
+            <div style="width:100%; height:280px; background:linear-gradient(135deg, #f5efe0 0%, #e8dcc8 100%); display:flex; align-items:center; justify-content:center; position:relative;">
+                <div style="text-align:center;">
+                    <div style="font-size:64px; margin-bottom:12px;">🏛️</div>
+                    <span style="font-family:var(--font-display); font-size:13px; color:var(--text-secondary); letter-spacing:2px;">登州博物馆 · 全景漫游入口</span>
+                </div>
+                <!-- 底部渐变遮罩 -->
+                <div style="position:absolute; bottom:0; left:0; right:0; height:60px; background:linear-gradient(to top, rgba(245,239,224,0.9), transparent);"></div>
+            </div>
+            <!-- 卡片信息区 -->
+            <div style="padding:24px; background:var(--bg-card);">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <div>
+                        <h3 style="font-family:var(--font-display); font-size:18px; color:var(--gold); letter-spacing:3px; margin-bottom:6px;">登州博物馆</h3>
+                        <p style="color:var(--text-secondary); font-size:13px;">开启720°云端漫游之旅</p>
+                    </div>
+                    <div style="width:44px; height:44px; border-radius:50%; border:2px solid var(--gold); display:flex; align-items:center; justify-content:center;">
+                        <span style="font-size:18px; color:var(--gold);">▶</span>
+                    </div>
+                </div>
+                <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border-subtle);">
+                    <p style="color:var(--text-secondary); font-size:12px; line-height:1.6;">
+                        名人厅 · 文物厅 · 古城厅<br>
+                        全方位漫游，沉浸式解读登州历史文化
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 操作提示 -->
+    <div class="card fade-in-up delay-2" style="max-width:600px; margin:24px auto 0; text-align:center;">
+        <div style="font-size:32px; margin-bottom:8px;">🖱️</div>
+        <p style="color:var(--text-secondary); font-size:13px;">
+            点击上方卡片，观看开屏动画后选择展厅开始漫游
+        </p>
+    </div>
+</section>
+
+            <!-- 漫游说明卡片 -->
+            <div class="card fade-in-up delay-2" style="margin-top:24px; display:flex; align-items:center; gap:20px;">
+                <div style="font-size:40px;">🖱️</div>
+                <div>
+                    <div class="card-title" style="margin-bottom:8px;">// 操作指引</div>
+                    <p style="color:var(--text-secondary); font-size:13px;">
+                        W/A/S/D 移动视角 · 鼠标拖拽旋转 · 滚轮缩放 · 点击文物查看详情
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== S6: 研学中心 ========== -->
+        <section id="section-education" class="section">
+            <div class="section-header fade-in-up">
+                <span style="font-family:var(--font-display); font-size:12px; letter-spacing:4px; color:var(--neon-cyan);">EDUCATION</span>
+                <h2 style="font-size:32px; margin-top:12px;">研学中心</h2>
+                <p style="color:var(--text-secondary); margin-top:8px;">面向中小学研学旅行 · 沉浸式历史文化课堂</p>
+                <div style="width:60px; height:1px; background:var(--neon-cyan); margin:20px 0;"></div>
+            </div>
+
+            <div class="edu-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:24px; margin-top:40px;">
+                <div class="card fade-in-up delay-2" style="text-align:center;">
+                    <div style="font-size:48px; margin-bottom:16px;">📚</div>
+                    <div class="card-title">研学课程</div>
+                    <p style="color:var(--text-secondary); font-size:13px;">
+                        "海上丝路探秘"<br>"古港军事文化"<br>"文物鉴赏与历史"
+                    </p>
+                    <button class="btn-primary" style="margin-top:16px;">了解课程</button>
+                </div>
+                <div class="card fade-in-up delay-3" style="text-align:center;">
+                    <div style="font-size:48px; margin-bottom:16px;">🏫</div>
+                    <div class="card-title">团体预约</div>
+                    <p style="color:var(--text-secondary); font-size:13px;">
+                        中小学团体参观预约<br>专属导览服务<br>研学活动定制
+                    </p>
+                    <button class="btn-primary" style="margin-top:16px;">立即预约</button>
+                </div>
+                <div class="card fade-in-up delay-4" style="text-align:center;">
+                    <div style="font-size:48px; margin-bottom:16px;">🎯</div>
+                    <div class="card-title">互动学习</div>
+                    <p style="color:var(--text-secondary); font-size:13px;">
+                        3D文物拼图<br>古港知识问答<br>虚拟考古体验
+                    </p>
+                    <button class="btn-primary" style="margin-top:16px;">开始体验</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JS引入 -->
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/unity-bridge.js"></script>
+</body>
+</html>

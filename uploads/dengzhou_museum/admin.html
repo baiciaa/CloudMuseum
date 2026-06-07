@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登州博物馆 · 后台管理</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Inter:wght@300;400;500;700&display=swap');
+        :root {
+            --gold: #c4a265;
+            --red: #ad3a2f;
+            --bg: #fdfaf5;
+            --text: #3e3232;
+            --text-secondary: #8c8074;
+            --border: rgba(196, 162, 101, 0.2);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+        .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-family: 'Noto Serif SC', serif; color: var(--gold); text-align: center; letter-spacing: 4px; margin-bottom: 40px; }
+        .card { background: rgba(196,162,101,0.04); border:1px solid var(--border); border-radius:4px; padding:24px; margin-bottom:20px; }
+        .card h3 { color: var(--gold); margin-bottom: 16px; }
+        input, textarea, select { width:100%; padding:10px; margin-bottom:12px; border:1px solid var(--border); border-radius:2px; background:#fff; font-family:inherit; font-size:14px; }
+        textarea { min-height:120px; resize:vertical; }
+        button { padding:10px 24px; background:transparent; border:1px solid var(--gold); color:var(--gold); cursor:pointer; font-size:14px; letter-spacing:2px; transition:all 0.3s; }
+        button:hover { background:rgba(196,162,101,0.1); }
+        .login-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); display:flex; align-items:center; justify-content:center; z-index:1000; }
+        .login-box { text-align:center; padding:40px; border:1px solid var(--border); border-radius:4px; }
+        .login-box input { width:250px; text-align:center; }
+        .hidden { display:none !important; }
+        .status-msg { padding:10px; margin:10px 0; border-radius:2px; text-align:center; }
+        .status-success { background:rgba(196,162,101,0.1); color:var(--gold); }
+        .status-error { background:rgba(173,58,47,0.1); color:var(--red); }
+    </style>
+</head>
+<body>
+
+    <!-- 登录界面 -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-box">
+            <h2 style="color:var(--gold); letter-spacing:4px; margin-bottom:20px;">后台管理登录</h2>
+            <input type="password" id="adminPassword" placeholder="请输入管理密码" onkeydown="if(event.key==='Enter') adminLogin()">
+            <br>
+            <button onclick="adminLogin()">登 录</button>
+            <p id="loginError" style="color:var(--red); margin-top:12px; display:none;">密码错误</p>
+        </div>
+    </div>
+
+    <!-- 管理界面（登录后显示） -->
+    <div class="container hidden" id="adminPanel">
+        <button onclick="adminLogout()" style="float:right; font-size:12px;">退出登录</button>
+        <h1>登州博物馆 · 后台管理</h1>
+
+        <!-- 文物管理 -->
+        <div class="card">
+            <h3>新增 / 更新文物</h3>
+            <input type="text" id="relicId" placeholder="文物ID（留空则新建，填写则更新）" style="width:200px;">
+            <input type="text" id="relicName" placeholder="文物名称 *">
+            <input type="text" id="relicEra" placeholder="年代（如：明代）">
+            <input type="text" id="relicCategory" placeholder="分类（如：青铜器）">
+            <textarea id="relicDesc" placeholder="文物描述"></textarea>
+            <input type="text" id="relicImage" placeholder="图片URL（如：/uploads/images/xxx.jpg）">
+            <button onclick="saveRelic()">保存文物</button>
+            <div id="relicStatus"></div>
+        </div>
+
+        <!-- 文物列表 -->
+        <div class="card">
+            <h3>文物列表（点击删除）</h3>
+            <div id="relicList" style="max-height:400px; overflow-y:auto;">
+                加载中...
+            </div>
+        </div>
+
+        <!-- 文章管理 -->
+        <div class="card">
+            <h3>新增文章</h3>
+            <select id="articleType">
+                <option value="HISTORY">历史背景</option>
+                <option value="INTRO">博物馆介绍</option>
+                <option value="NEWS">新闻动态</option>
+            </select>
+            <input type="text" id="articleTitle" placeholder="文章标题 *">
+            <textarea id="articleContent" placeholder="文章内容（支持HTML）"></textarea>
+            <button onclick="saveArticle()">发布文章</button>
+            <div id="articleStatus"></div>
+        </div>
+    </div>
+
+    <script>
+        const ADMIN_PASSWORD = 'dengzhou2026'; // ⚠️ 生产环境改成更复杂的密码
+        const API_BASE = 'http://localhost:8081';
+
+        // ==================== 登录管理 ====================
+        function adminLogin() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('adminPanel').classList.remove('hidden');
+                loadRelicList();
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+            }
+        }
+
+        function adminLogout() {
+            document.getElementById('loginOverlay').classList.remove('hidden');
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        // ==================== 文物管理 ====================
+        async function saveRelic() {
+            const id = document.getElementById('relicId').value;
+            const data = {
+                name: document.getElementById('relicName').value,
+                era: document.getElementById('relicEra').value,
+                category: document.getElementById('relicCategory').value,
+                description: document.getElementById('relicDesc').value,
+                imageUrl: document.getElementById('relicImage').value
+            };
+
+            if (!data.name) {
+                showStatus('relicStatus', '请填写文物名称', 'error');
+                return;
+            }
+
+            let result;
+            if (id) {
+                result = await apiPut(`/api/relics/${id}`, data);
+            } else {
+                result = await apiPost('/api/relics', data);
+            }
+
+            if (result.success) {
+                showStatus('relicStatus', '保存成功！', 'success');
+                loadRelicList();
+                clearRelicForm();
+            } else {
+                showStatus('relicStatus', '保存失败: ' + result.message, 'error');
+            }
+        }
+
+        async function loadRelicList() {
+            const data = await apiGet('/api/relics?page=1&size=50');
+            const listDiv = document.getElementById('relicList');
+
+            if (!data || !data.list || data.list.length === 0) {
+                listDiv.innerHTML = '<p>暂无文物数据</p>';
+                return;
+            }
+
+            listDiv.innerHTML = data.list.map(relic => `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border);">
+                    <span>
+                        <strong>${relic.name}</strong>
+                        <span style="color:var(--text-secondary); font-size:12px;">${relic.era || ''} ${relic.category || ''}</span>
+                    </span>
+                    <span>
+                        <button onclick="editRelic(${relic.id})" style="font-size:11px; padding:4px 12px; margin-right:8px;">编辑</button>
+                        <button onclick="deleteRelicById(${relic.id})" style="font-size:11px; padding:4px 12px; border-color:var(--red); color:var(--red);">删除</button>
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        async function editRelic(id) {
+            const relic = await apiGet(`/api/relics/${id}`);
+            if (relic) {
+                document.getElementById('relicId').value = relic.id;
+                document.getElementById('relicName').value = relic.name || '';
+                document.getElementById('relicEra').value = relic.era || '';
+                document.getElementById('relicCategory').value = relic.category || '';
+                document.getElementById('relicDesc').value = relic.description || '';
+                document.getElementById('relicImage').value = relic.imageUrl || '';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        async function deleteRelicById(id) {
+            if (!confirm('确定删除该文物？')) return;
+            const result = await apiDelete(`/api/relics/${id}`);
+            if (result.success) {
+                alert('删除成功');
+                loadRelicList();
+            } else {
+                alert('删除失败: ' + result.message);
+            }
+        }
+
+        function clearRelicForm() {
+            document.getElementById('relicId').value = '';
+            document.getElementById('relicName').value = '';
+            document.getElementById('relicEra').value = '';
+            document.getElementById('relicCategory').value = '';
+            document.getElementById('relicDesc').value = '';
+            document.getElementById('relicImage').value = '';
+        }
+
+        // ==================== 文章管理 ====================
+        async function saveArticle() {
+            const data = {
+                title: document.getElementById('articleTitle').value,
+                content: document.getElementById('articleContent').value,
+                type: document.getElementById('articleType').value,
+                status: 'PUBLISHED'
+            };
+
+            if (!data.title || !data.content) {
+                showStatus('articleStatus', '请填写标题和内容', 'error');
+                return;
+            }
+
+            const result = await apiPost('/api/articles', data);
+
+            if (result.success) {
+                showStatus('articleStatus', '发布成功！', 'success');
+                document.getElementById('articleTitle').value = '';
+                document.getElementById('articleContent').value = '';
+            } else {
+                showStatus('articleStatus', '发布失败: ' + result.message, 'error');
+            }
+        }
+
+        // ==================== 通用工具函数 ====================
+        function showStatus(elementId, message, type) {
+            const el = document.getElementById(elementId);
+            el.innerHTML = `<div class="status-msg status-${type}">${message}</div>`;
+            setTimeout(() => { el.innerHTML = ''; }, 3000);
+        }
+
+        // 复用 api.js 中的函数（admin.html 也需要引入 api.js）
+    </script>
+    <script src="assets/js/api.js"></script>
+</body>
+</html>
