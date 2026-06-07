@@ -184,55 +184,6 @@ const ENTITY_CONFIG = {
             { key: 'scheduleInfo', label: '课程安排(JSON)', type: 'textarea' }
         ]
     },
-    recruitments: {
-        label: '招募',
-        listUrl: '/admin/recruitments',
-        createUrl: '/recruitments',
-        updateUrl: id => `/recruitments/${id}`,
-        deleteUrl: id => `/recruitments/${id}`,
-        listFn: async () => { const r = await api.get('/admin/recruitments'); return r; },
-        fields: [
-            { key: 'id', label: 'ID', width: 60 },
-            { key: 'name', label: '姓名', width: 80 },
-            { key: 'phone', label: '手机号', width: 120 },
-            { key: 'type', label: '类型', width: 80 },
-            { key: 'status', label: '状态', width: 70 },
-            { key: 'school', label: '学校/单位' },
-            { key: 'createdAt', label: '报名时间', width: 160, render: v => v ? new Date(v).toLocaleString() : '-' }
-        ],
-        formFields: [
-            { key: 'name', label: '姓名', required: true },
-            { key: 'phone', label: '手机号', required: true },
-            { key: 'email', label: '邮箱' },
-            { key: 'age', label: '年龄', type: 'number' },
-            { key: 'school', label: '学校/单位' },
-            { key: 'type', label: '类型', type: 'select', options: ['VOLUNTEER', 'ACTIVITY'] },
-            { key: 'status', label: '状态', type: 'select', options: ['PENDING', 'APPROVED', 'REJECTED'] },
-            { key: 'intro', label: '申请理由', type: 'textarea' }
-        ]
-    },
-    announcements: {
-        label: '资讯',
-        listUrl: '/admin/announcements',
-        createUrl: '/announcements',
-        updateUrl: id => `/announcements/${id}`,
-        deleteUrl: id => `/announcements/${id}`,
-        listFn: async () => { const r = await api.get('/announcements?page=1&size=999'); return r; },
-        fields: [
-            { key: 'id', label: 'ID', width: 60 },
-            { key: 'title', label: '标题', render: v => `<span class="cell-truncate">${esc(v)}</span>` },
-            { key: 'type', label: '类型', width: 80 },
-            { key: 'status', label: '状态', width: 70 },
-            { key: 'createdAt', label: '创建时间', width: 160, render: v => v ? new Date(v).toLocaleString() : '-' }
-        ],
-        formFields: [
-            { key: 'title', label: '标题', required: true },
-            { key: 'type', label: '类型', type: 'select', options: ['NOTICE', 'EDUCATION'], required: true },
-            { key: 'status', label: '状态', type: 'select', options: ['PUBLISHED', 'DRAFT'] },
-            { key: 'coverImage', label: '封面图URL(仅EDUCATION)' },
-            { key: 'content', label: '内容', type: 'textarea', required: true }
-        ]
-    },
     reservations: {
         label: '预约',
         listUrl: '/reservations',
@@ -259,6 +210,52 @@ const ENTITY_CONFIG = {
             { key: 'contactName', label: '联系人姓名' },
             { key: 'contactPhone', label: '联系人电话' },
             { key: 'remarks', label: '备注', type: 'textarea' }
+        ]
+    },
+    announcements: {
+        label: '公告',
+        listUrl: '/admin/announcements',
+        createUrl: '/announcements',
+        updateUrl: id => `/announcements/${id}`,
+        deleteUrl: id => `/announcements/${id}`,
+        fields: [
+            { key: 'id', label: 'ID', width: 60 },
+            { key: 'title', label: '标题' },
+            { key: 'type', label: '类型', width: 80 },
+            { key: 'status', label: '状态', width: 80 },
+            { key: 'createdAt', label: '创建时间', width: 160, render: v => v ? new Date(v).toLocaleString() : '-' }
+        ],
+        formFields: [
+            { key: 'title', label: '标题', required: true },
+            { key: 'type', label: '类型', type: 'select', options: ['NOTICE', 'EDUCATION'], required: true },
+            { key: 'status', label: '状态', type: 'select', options: ['PUBLISHED', 'DRAFT'] },
+            { key: 'coverImage', label: '封面图URL' },
+            { key: 'content', label: '内容', type: 'textarea', required: true }
+        ]
+    },
+    recruitments: {
+        label: '招募',
+        listUrl: '/admin/recruitments',
+        createUrl: '/recruitments',
+        updateUrl: id => `/recruitments/${id}`,
+        deleteUrl: id => `/recruitments/${id}`,
+        fields: [
+            { key: 'id', label: 'ID', width: 60 },
+            { key: 'name', label: '姓名', width: 80 },
+            { key: 'phone', label: '电话', width: 120 },
+            { key: 'type', label: '类型', width: 80 },
+            { key: 'status', label: '状态', width: 80 },
+            { key: 'createdAt', label: '创建时间', width: 160, render: v => v ? new Date(v).toLocaleString() : '-' }
+        ],
+        formFields: [
+            { key: 'name', label: '姓名', required: true },
+            { key: 'phone', label: '手机号' },
+            { key: 'email', label: '邮箱', type: 'email' },
+            { key: 'age', label: '年龄', type: 'number' },
+            { key: 'school', label: '学校' },
+            { key: 'intro', label: '简介', type: 'textarea' },
+            { key: 'type', label: '类型', type: 'select', options: ['VOLUNTEER', 'ACTIVITY'] },
+            { key: 'status', label: '状态', type: 'select', options: ['PENDING', 'APPROVED', 'REJECTED'] }
         ]
     }
 };
@@ -348,10 +345,10 @@ const app = {
                             <span class="icon">&#9992;</span><span>预约管理</span>
                         </li>
                         <li class="nav-item ${hash === 'announcements' ? 'active' : ''}" data-page="announcements">
-                            <span class="icon">&#9993;</span><span>资讯管理</span>
+                            <span class="icon">&#9881;</span><span>公告管理</span>
                         </li>
                         <li class="nav-item ${hash === 'recruitments' ? 'active' : ''}" data-page="recruitments">
-                            <span class="icon">&#9997;</span><span>招募管理</span>
+                            <span class="icon">&#9993;</span><span>招募管理</span>
                         </li>
                     </ul>
                     <div class="sidebar-footer">
@@ -387,113 +384,53 @@ const app = {
         }
     },
 
-    drawVisitChart(canvasId, trend) {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas || !trend || trend.length === 0) return;
-        const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.parentElement.getBoundingClientRect();
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-        canvas.style.width = rect.width + 'px';
-        canvas.style.height = rect.height + 'px';
-        ctx.scale(dpr, dpr);
-
-        const w = rect.width, h = rect.height;
-        const pad = { top: 8, bottom: 20, left: 8, right: 8 };
-        const cw = w - pad.left - pad.right;
-        const ch = h - pad.top - pad.bottom;
-
-        const pvs = trend.map(t => t.pv);
-        const max = Math.max(...pvs, 1);
-        const barW = Math.min(28, cw / trend.length * 0.6);
-        const gap = cw / trend.length;
-
-        ctx.clearRect(0, 0, w, h);
-
-        // 柱状图
-        pvs.forEach((pv, i) => {
-            const barH = (pv / max) * ch;
-            const x = pad.left + i * gap + (gap - barW) / 2;
-            const y = pad.top + ch - barH;
-
-            // 渐变柱
-            const grad = ctx.createLinearGradient(x, y, x, pad.top + ch);
-            grad.addColorStop(0, '#b8942e');
-            grad.addColorStop(1, 'rgba(185,148,46,0.2)');
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.roundRect(x, y, barW, barH, [2, 2, 0, 0]);
-            ctx.fill();
-
-            // 数值
-            ctx.fillStyle = '#6b5d50';
-            ctx.font = '9px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(pv, pad.left + i * gap + gap / 2, y - 4);
-
-            // 日期标签
-            const label = trend[i].date.slice(5);
-            ctx.fillText(label, pad.left + i * gap + gap / 2, pad.top + ch + 14);
-        });
-    },
-
     async renderDashboard(main) {
         main.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-        const [entityR, visitR] = await Promise.all([
+        const [sr, vs] = await Promise.all([
             api.get('/admin/stats'),
-            api.get('/admin/visits/stats')
+            api.get('/admin/visits/stats').catch(() => ({ data: null }))
         ]);
-        if (!entityR.success) { main.innerHTML = '<p>加载失败</p>'; return; }
-        const stats = entityR.data;
-        const visitStats = visitR.success ? visitR.data : null;
+        if (!sr.success) { main.innerHTML = '<p>加载失败</p>'; return; }
+        const stats = sr.data;
+        const visits = vs?.data || {};
+
+        const labels = { users:'用户',articles:'文章',relics:'文物',courses:'课程',reservations:'预约',announcements:'公告',recruitments:'招募' };
+
+        let visitHtml = '';
+        if (visits.trend) {
+            const rows = visits.trend.map(d => `
+                <tr><td>${d.date}</td><td>${d.pv}</td><td>${d.uv}</td></tr>
+            `).join('');
+            visitHtml = `
+                <div class="dash-section">
+                    <div class="dash-section-title">网站访问统计</div>
+                    <div class="visit-summary">
+                        <div class="visit-summary-item"><div class="visit-summary-value">${visits.todayPV}</div><div class="visit-summary-label">今日 PV</div></div>
+                        <div class="visit-summary-item"><div class="visit-summary-value">${visits.todayUV}</div><div class="visit-summary-label">今日 UV</div></div>
+                        <div class="visit-summary-item"><div class="visit-summary-value">${visits.yesterdayPV}</div><div class="visit-summary-label">昨日 PV</div></div>
+                        <div class="visit-summary-item"><div class="visit-summary-value">${visits.totalPV}</div><div class="visit-summary-label">累计 PV</div></div>
+                    </div>
+                    <table class="data-table" style="margin-top:16px;">
+                        <thead><tr><th>日期</th><th>PV</th><th>UV</th></tr></thead>
+                        <tbody>${rows || '<tr><td colspan="3" class="empty">暂无数据</td></tr>'}</tbody>
+                    </table>
+                </div>`;
+        }
+
         main.innerHTML = `
-            <div class="page-header">
-                <h2>控制台</h2>
-                <p>系统数据概览</p>
-            </div>
-            ${visitStats ? `
-            <div class="visit-section">
-                <h3>网站浏览统计</h3>
-                <div class="visit-stats-grid">
-                    <div class="visit-card">
-                        <div class="visit-value">${visitStats.todayPV}</div>
-                        <div class="visit-label">今日 PV</div>
-                        <div class="visit-sub">昨日 ${visitStats.yesterdayPV}</div>
-                    </div>
-                    <div class="visit-card">
-                        <div class="visit-value">${visitStats.todayUV}</div>
-                        <div class="visit-label">今日 UV</div>
-                        <div class="visit-sub">昨日 ${visitStats.yesterdayUV}</div>
-                    </div>
-                    <div class="visit-card">
-                        <div class="visit-value">${visitStats.totalPV}</div>
-                        <div class="visit-label">累计 PV</div>
-                        <div class="visit-sub">总访问量</div>
-                    </div>
-                    <div class="visit-card">
-                        <div class="visit-value">${visitStats.trend ? visitStats.trend[6] ? visitStats.trend[6].pv : '-' : '-'}</div>
-                        <div class="visit-label">昨日 PV</div>
-                        <div class="visit-sub">近7日趋势</div>
-                    </div>
-                </div>
-                <div class="visit-chart-wrap">
-                    <canvas id="visitChart"></canvas>
-                </div>
-            </div>` : ''}
-            <div class="stats-grid">
-                ${Object.entries(stats).map(([k, v]) => `
-                    <div class="stat-card" data-page="${k}" style="cursor:pointer">
+            <div class="dash-section">
+                <div class="dash-section-title">数据概览</div>
+                <div class="stats-grid">
+                    ${Object.entries(stats).map(([k, v]) => `<div class="stat-card" data-page="${k}">
                         <div class="stat-value">${v}</div>
-                        <div class="stat-label">${ENTITY_CONFIG[k] ? ENTITY_CONFIG[k].label : k}</div>
+                        <div class="stat-label">${labels[k] || k}</div>
                     </div>`).join('')}
-            </div>`;
+                </div>
+            </div>
+            ${visitHtml}`;
         main.querySelectorAll('.stat-card').forEach(el => {
             el.onclick = () => { location.hash = el.dataset.page; };
         });
-        if (visitStats && visitStats.trend) {
-            this.drawVisitChart('visitChart', visitStats.trend);
-        }
     },
 
     async renderEntityList(main, entity) {
@@ -630,8 +567,8 @@ const app = {
                             ${item.imageUrl ? `<tr><th>图片</th><td><a href="${esc(item.imageUrl)}" target="_blank">查看原图</a></td></tr>` : ''}
                             ${item.modelUrl ? `<tr><th>3D模型</th><td><a href="${esc(item.modelUrl)}" target="_blank">${esc(item.modelUrl)}</a></td></tr>` : ''}
                             ${item.externalLink ? `<tr><th>外部链接</th><td><a href="${esc(item.externalLink)}" target="_blank">查看详情</a></td></tr>` : ''}
-                            <tr><th>创建时间</th><td>${item.createdAt ? new Date(item.createdAt).toLocaleString() : '-'}</td></tr>
-                            <tr><th>更新时间</th><td>${item.updatedAt ? new Date(item.updatedAt).toLocaleString() : '-'}</td></tr>
+                            <tr><th>创建时间</th><td>${item.createdAt ? new Date(item.createdAt).toLocaleString() : '-'}</tr>
+                            <tr><th>更新时间</th><td>${item.updatedAt ? new Date(item.updatedAt).toLocaleString() : '-'}</tr>
                         </table>
                     </div>
                 </div>
@@ -683,12 +620,9 @@ const app = {
                             <textarea id="field-${f.key}">${esc(val)}</textarea></div>`;
                     }
                     const inputType = f.type || 'text';
-                    const isImageUrl = f.key === 'coverImage';
-                    const displayVal = isImageUrl ? val : esc(val);
-                    const preview = isImageUrl && val ? `<div style="margin-top:6px;"><img src="${val}" style="max-width:200px;max-height:120px;border-radius:4px;border:1px solid var(--border);object-fit:cover;" onerror="this.style.display='none'"></div>` : '';
                     return `<div class="form-group"><label>${f.label}${f.required ? ' *' : ''}</label>
-                        <input type="${inputType}" id="field-${f.key}" value="${displayVal}" ${f.required && !isEdit ? 'required' : ''}>
-                        ${f.hint ? `<small style="color:#999;font-size:11px">${f.hint}</small>` : ''}${preview}</div>`;
+                        <input type="${inputType}" id="field-${f.key}" value="${esc(val)}" ${f.required && !isEdit ? 'required' : ''}>
+                        ${f.hint ? `<small style="color:#999;font-size:11px">${f.hint}</small>` : ''}</div>`;
                 }).join('')}
             </div>
             <div class="modal-footer">
@@ -715,8 +649,7 @@ const app = {
             if (r.success) {
                 overlay.remove();
                 toast(isEdit ? '更新成功' : '创建成功');
-                const main = document.getElementById('main-area');
-                entity === 'relics' ? this.renderRelicGrid(main) : this.renderEntityList(main, entity);
+                this.renderEntityList(document.getElementById('main-area'), entity);
             } else {
                 toast(r.message || '操作失败', 'error');
             }

@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登州博物馆 · 云端漫游 | DENGZHOU MUSEUM</title>
-  <script type="module" crossorigin src="/assets/main-Djs-1mar.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/index-BuIBpWQA.js">
-  <link rel="stylesheet" crossorigin href="/assets/main-BvLCl5gY.css">
+  <script type="module" crossorigin src="/assets/main-D4Ne-zDc.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="modulepreload" crossorigin href="/assets/index-DcZkWmgY.js">
+  <link rel="modulepreload" crossorigin href="/assets/DigitalHuman-Da-M-kVq.js">
+  <link rel="stylesheet" crossorigin href="/assets/main-jsz7p7x_.css">
 </head>
 <body>
 
@@ -18,7 +20,6 @@
             <li class="nav-item" data-section="history">馆舍概况 MUSEUM</li>
             <li class="nav-item" data-section="relics">镇馆之宝 TREASURES</li>
             <li class="nav-item" data-section="tour">资讯公告 NOTICES</li>
-            <li class="nav-item" data-section="explore">云端漫游 EXPLORE</li>
             <li class="nav-item" data-section="education">研学中心 EDU</li>
         </ul>
         <div class="nav-footer" style="padding:0 28px; font-size:10px; color:var(--text-secondary);">
@@ -29,28 +30,29 @@
     <!-- ==================== 主内容区 ==================== -->
     <main class="main-content">
 
-        <!-- ========== S1: 首页 Hero ========== -->
-        <section id="section-home" class="section section-hero">
-            <!-- 背景图轮播层（JS动态填充 / 无图时CSS渐变fallback） -->
-            <div class="hero-bg-slideshow" id="heroBgSlideshow"></div>
-            <div class="hero-particles">
-                <div class="particle"></div><div class="particle"></div><div class="particle"></div>
-                <div class="particle"></div><div class="particle"></div><div class="particle"></div>
-                <div class="particle"></div><div class="particle"></div><div class="particle"></div>
-                <div class="particle"></div>
+        <!-- ========== S1: 首页 Hero（360°全景VR） ========== -->
+        <section id="section-home" class="section section-pano">
+            <!-- 加载动画 -->
+            <div id="pano-loading" class="pano-loading">
+                <div class="pano-spinner"></div>
+                <div class="pano-loader-text" id="pano-loader-text">加载场景...</div>
             </div>
-            <div class="hero-content">
-                <p class="hero-subtitle">DENGZHOU MUSEUM</p>
-                <h1 class="hero-title neon-text">登州博物馆</h1>
-                <p class="hero-desc">
-                    云端漫游 · 穿越千年的古港记忆
-                </p>
-                <div class="hero-actions">
-                    <button class="btn-primary btn-ripple" onclick="window.location.href='/tour.html'">
-                        进入漫游 ENTER
-                    </button>
-                </div>
+            <!-- Three.js 渲染容器 -->
+            <div id="pano-container"></div>
+            <!-- 全景UI覆盖层 -->
+            <div class="pano-header">
+                <span class="pano-logo">⛩️ 蓬莱阁</span>
+                <button class="pano-fs-btn" id="pano-fs-btn" title="全屏">⛶</button>
             </div>
+            <div class="pano-info">
+                <div class="pano-scene-name" id="pano-scene-name">蓬莱阁</div>
+                <div class="pano-scene-cat" id="pano-scene-cat">古建筑群</div>
+            </div>
+            <div class="pano-nav-btns">
+                <button class="pano-nav-btn" id="pano-prev">‹</button>
+                <button class="pano-nav-btn" id="pano-next">›</button>
+            </div>
+            <div class="pano-scene-bar" id="pano-scene-bar"></div>
         </section>
 
         <!-- ========== S2: 馆舍概况 ========== -->
@@ -153,93 +155,12 @@
                     <p style="color:var(--text-secondary); font-size:13px;">免费参观（需预约）</p>
                 </div>
             </div>
-
-            <div class="fade-in-up delay-2" style="margin-top:30px; text-align:center;">
-                <button class="btn-primary btn-ripple" onclick="generateTourPlan()" style="font-size:14px; padding:16px 48px;">
-                    &#x1f916; AI 生成出行攻略
-                </button>
-                <p style="color:var(--text-secondary); font-size:11px; margin-top:12px;">
-                    基于您的实时位置、天气、人流量等多维数据分析生成个性化攻略
-                </p>
-            </div>
-
-            <div id="ai-result" class="card fade-in-up delay-3" style="margin-top:30px; display:none;">
-                <div class="card-title">// AI_GENERATED_PLAN</div>
-                <div id="ai-result-content" style="color:var(--text-secondary); line-height:1.8;"></div>
+            <div id="notice-list" class="fade-in-up delay-1" style="margin-top:24px;">
+                <div style="text-align:center;padding:40px;color:var(--text-secondary);font-size:13px;">加载中...</div>
             </div>
         </section>
 
-        <!-- ========== S5: 云端漫游 ========== -->
-        <section id="section-explore" class="section">
-            <div class="section-header fade-in-up">
-                <span class="section-label">EXPLORE</span>
-                <h2 class="section-title">云端漫游</h2>
-                <p class="section-subtitle">720&deg;全景 &middot; 身临其境感受千年古港</p>
-                <div class="section-divider">
-                    <span class="divider-cloud">
-                        <svg width="40" height="16" viewBox="0 0 40 16" fill="none">
-                            <path d="M5 12 Q8 8 12 10 Q14 6 18 8 Q20 4 24 7 Q27 5 30 8 Q33 6 35 9" stroke="#c4a265" stroke-opacity="0.4" stroke-width="1" fill="none"/>
-                        </svg>
-                    </span>
-                    <span class="divider-icon">
-                        <svg width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="10" fill="none" stroke="#c4a265" stroke-width="1"/><polygon points="11,9 11,19 20,14" fill="#c4a265" opacity="0.5"/></svg>
-                    </span>
-                    <span class="divider-cloud right">
-                        <svg width="40" height="16" viewBox="0 0 40 16" fill="none">
-                            <path d="M5 12 Q8 8 12 10 Q14 6 18 8 Q20 4 24 7 Q27 5 30 8 Q33 6 35 9" stroke="#c4a265" stroke-opacity="0.4" stroke-width="1" fill="none"/>
-                        </svg>
-                    </span>
-                </div>
-            </div>
-
-            <div class="fade-in-up delay-1" style="max-width:600px; margin:40px auto 0;">
-                <div class="tour-entrance" onclick="enterMuseumTour()">
-                    <div class="tour-entrance-bg">
-                        <div style="text-align:center;position:relative;z-index:1;">
-                            <div class="tour-entrance-icon">&#x1f3db;</div>
-                            <span style="font-family:var(--font-display); font-size:13px; color:var(--text-secondary); letter-spacing:2px;">登州博物馆 &middot; 全景漫游入口</span>
-                        </div>
-                        <div style="position:absolute; bottom:0; left:0; right:0; height:60px; background:linear-gradient(to top, rgba(245,239,224,0.9), transparent);"></div>
-                    </div>
-                    <div style="padding:24px; background:var(--bg-card);">
-                        <div style="display:flex; align-items:center; justify-content:space-between;">
-                            <div>
-                                <h3 style="font-family:var(--font-display); font-size:18px; color:var(--gold); letter-spacing:3px; margin-bottom:6px;">登州博物馆</h3>
-                                <p style="color:var(--text-secondary); font-size:13px;">开启720&deg;云端漫游之旅</p>
-                            </div>
-                            <div class="play-btn-circle">
-                                <span style="font-size:18px; color:var(--gold);">&#x25b6;</span>
-                            </div>
-                        </div>
-                        <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border-subtle);">
-                            <p style="color:var(--text-secondary); font-size:12px; line-height:1.6;">
-                                名人厅 &middot; 文物厅 &middot; 古城厅<br>
-                                全方位漫游，沉浸式解读登州历史文化
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card fade-in-up delay-2" style="max-width:600px; margin:24px auto 0; text-align:center;">
-                <div style="font-size:32px; margin-bottom:8px;">&#x1f5b1;</div>
-                <p style="color:var(--text-secondary); font-size:13px;">
-                    点击上方卡片，观看开屏动画后选择展厅开始漫游
-                </p>
-            </div>
-
-            <div class="card fade-in-up delay-2" style="margin-top:24px; display:flex; align-items:center; gap:20px;">
-                <div style="font-size:40px;">&#x1f5b1;</div>
-                <div>
-                    <div class="card-title" style="margin-bottom:8px;">// 操作指引</div>
-                    <p style="color:var(--text-secondary); font-size:13px;">
-                        W/A/S/D 移动视角 &middot; 鼠标拖拽旋转 &middot; 滚轮缩放 &middot; 点击文物查看详情
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- ========== S6: 研学中心 ========== -->
+        <!-- ========== S5: 研学中心 ========== -->
         <section id="section-education" class="section">
             <div class="section-header fade-in-up">
                 <span class="section-label" style="color:var(--neon-cyan);">EDUCATION</span>
@@ -262,7 +183,14 @@
                 </div>
             </div>
 
-            <div class="edu-grid" style="margin-top:40px;">
+            <div style="margin-top:32px;">
+                <h3 style="font-family:var(--font-display);font-size:16px;letter-spacing:2px;color:var(--gold);margin-bottom:16px;">研学动态</h3>
+                <div id="edu-news-list">
+                    <div style="text-align:center;padding:40px;color:var(--text-secondary);font-size:13px;">加载中...</div>
+                </div>
+            </div>
+
+            <div class="edu-grid" style="margin-top:32px;">
                 <div class="card fade-in-up delay-2" style="text-align:center;">
                     <div class="edu-icon">&#x1f4da;</div>
                     <div class="card-title">研学课程</div>
@@ -279,6 +207,14 @@
                     </p>
                     <button class="btn-primary" style="margin-top:16px;" onclick="window.showReservationModal()">立即预约</button>
                 </div>
+                <div class="card fade-in-up delay-4" style="text-align:center;">
+                    <div class="edu-icon">&#x1f465;</div>
+                    <div class="card-title">招募报名</div>
+                    <p style="color:var(--text-secondary); font-size:13px;">
+                        志愿者招募<br>活动参与者招募<br>填写个人信息报名
+                    </p>
+                    <button class="btn-primary" style="margin-top:16px;" onclick="window.showRecruitmentModal()">立即报名</button>
+                </div>
             </div>
         </section>
 
@@ -288,7 +224,7 @@
     <footer class="site-footer">
         <div class="footer-left">DENGZHOU MUSEUM</div>
         <div class="footer-right">
-            登州博物馆<span>|</span>蓬莱 · 烟台<span>|</span>东方海上丝绸之路始发港
+            登州博物馆<span>|</span>蓬莱 · 烟台<span>|</span>联系电话：0535-5668021<span>|</span>东方海上丝绸之路始发港
         </div>
     </footer>
 
@@ -300,5 +236,16 @@
     </div>
 
     <!-- JS模块引入 -->
+    <!-- 网站浏览统计 -->
+    <script>
+    (function() {
+        fetch('/api/visits/track', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pagePath: window.location.pathname }),
+            keepalive: true
+        }).catch(function(){});
+    })();
+    </script>
 </body>
 </html>

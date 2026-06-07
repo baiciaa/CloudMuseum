@@ -893,6 +893,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (sceneName) sceneName.textContent = sd.name;
         if (sceneCat) sceneCat.textContent = cat;
       },
+      setActiveScene: (idx) => {
+        if (!sceneBar) return;
+        sceneBar.querySelectorAll('.pano-scene-dot').forEach((d, i) => {
+          d.classList.toggle('active', i === idx);
+        });
+      },
       setScenes: (list) => {
         if (!sceneBar) return;
         sceneBar.innerHTML = list.map((s, i) =>

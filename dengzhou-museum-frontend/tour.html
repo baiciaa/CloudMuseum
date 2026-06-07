@@ -102,8 +102,8 @@
         }
         .tour-digital-human:hover { transform: scale(1.05); }
         .tour-dh-container {
-            width: 100px;
-            height: 140px;
+            width: 200px;
+            height: 280px;
             pointer-events: none;
             position: relative;
         }
@@ -127,14 +127,14 @@
             transition: opacity 0.5s;
         }
         .tour-dh-fallback .icon {
-            font-size: 40px;
+            font-size: 80px;
             line-height: 1;
             filter: drop-shadow(0 2px 8px rgba(196,162,101,0.3));
         }
         .tour-dh-fallback .ring {
             position: absolute;
-            width: 80px;
-            height: 80px;
+            width: 160px;
+            height: 160px;
             border-radius: 50%;
             border: 1px solid rgba(196,162,101,0.15);
             animation: pulse-ring 3s ease-in-out infinite;
@@ -161,7 +161,7 @@
         /* ========== 登州小吏 气泡提示 ========== */
         .tour-dh-tooltip {
             position: fixed;
-            bottom: 230px;
+            bottom: 370px;
             right: 30px;
             z-index: 20;
             background: rgba(0,0,0,0.75);
@@ -202,11 +202,129 @@
             .tour-header .museum-title { font-size: 13px; letter-spacing: 2px; }
             .hint-text { font-size: 10px; bottom: 20px; }
             .tour-digital-human { bottom: 60px; right: 10px; }
-            .tour-dh-container { width: 70px; height: 100px; }
-            .tour-dh-fallback .icon { font-size: 30px; }
-            .tour-dh-fallback .ring { width: 56px; height: 56px; }
+            .tour-dh-container { width: 140px; height: 200px; }
+            .tour-dh-fallback .icon { font-size: 60px; }
+            .tour-dh-fallback .ring { width: 110px; height: 110px; }
             .tour-dh-tooltip { right: 10px; max-width: 200px; font-size: 12px; }
+            .tour-chat-panel { right: 10px; width: calc(100vw - 20px); max-width: 340px; bottom: 10px; max-height: 60vh; }
         }
+
+        /* ========== 聊天对话框 ========== */
+        .tour-chat-overlay {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            z-index: 30;
+            display: none;
+        }
+        .tour-chat-overlay.open { display: block; }
+        .tour-chat-panel {
+            position: fixed;
+            right: 20px;
+            bottom: 380px;
+            width: 360px;
+            max-height: 70vh;
+            background: rgba(10,10,15,0.92);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(200,164,92,0.2);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+            overflow: hidden;
+            animation: chatSlideIn .3s ease;
+        }
+        @keyframes chatSlideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tour-chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            background: rgba(200,164,92,.08);
+        }
+        .tour-chat-header-title {
+            font-family: var(--font-display);
+            font-size: 14px;
+            color: var(--gold);
+            letter-spacing: 1px;
+        }
+        .tour-chat-close {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,.4);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+        }
+        .tour-chat-close:hover { color: #fff; }
+        .tour-chat-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            min-height: 100px;
+            max-height: 400px;
+        }
+        .tour-chat-bubble {
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.7;
+            max-width: 85%;
+            white-space: pre-wrap;
+        }
+        .tour-chat-bubble.user {
+            background: rgba(200,164,92,.2);
+            color: #e8d8b8;
+            margin-left: auto;
+            border-radius: 8px 2px 8px 8px;
+        }
+        .tour-chat-bubble.assistant {
+            background: rgba(255,255,255,.06);
+            color: rgba(255,255,255,.85);
+            margin-right: auto;
+            border-radius: 2px 8px 8px 8px;
+        }
+        .tour-chat-bubble.typing {
+            color: rgba(255,255,255,.4);
+            font-style: italic;
+        }
+        .tour-chat-input-area {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            border-top: 1px solid rgba(255,255,255,.06);
+        }
+        .tour-chat-input {
+            flex: 1;
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: 6px;
+            padding: 10px 14px;
+            color: #e8e0d0;
+            font-size: 13px;
+            outline: none;
+            font-family: var(--font-body);
+        }
+        .tour-chat-input:focus { border-color: rgba(200,164,92,.4); }
+        .tour-chat-input::placeholder { color: rgba(255,255,255,.2); }
+        .tour-chat-send {
+            background: rgba(200,164,92,.2);
+            border: 1px solid rgba(200,164,92,.3);
+            border-radius: 6px;
+            color: var(--gold);
+            padding: 0 16px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: .2s;
+        }
+        .tour-chat-send:hover { background: rgba(200,164,92,.35); }
+        .tour-chat-send:disabled { opacity: .3; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -244,12 +362,30 @@
         在下登州小吏，云端导览使。<br>
         此间乃登州博物馆名人厅，<br>
         请君随意游览。
-        <span class="close-hint">点击小吏关闭提示</span>
+        <span class="close-hint">点击小吏打开聊天</span>
+    </div>
+
+    <!-- 聊天对话框 -->
+    <div class="tour-chat-overlay" id="tourChatOverlay">
+        <div class="tour-chat-panel">
+            <div class="tour-chat-header">
+                <span class="tour-chat-header-title">&#x1f3ef; 登州小吏</span>
+                <button class="tour-chat-close" id="tourChatClose">&times;</button>
+            </div>
+            <div class="tour-chat-body" id="tourChatBody">
+                <div class="tour-chat-bubble assistant">在下登州小吏，乃登州博物馆云端导览使。&#10;&#10;若有疑问，尽管道来。</div>
+            </div>
+            <div class="tour-chat-input-area">
+                <input type="text" class="tour-chat-input" id="tourChatInput" placeholder="输入您的问题..." />
+                <button class="tour-chat-send" id="tourChatSend">发送</button>
+            </div>
+        </div>
     </div>
 
     <script>
         window.goBack = function() { window.location.href = '/'; };
         document.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' && e.target.tagName === 'INPUT') return;
             if (e.key === 'Escape' || e.key === 'Backspace') {
                 e.preventDefault();
                 window.goBack();
@@ -259,7 +395,9 @@
 
     <script type="module">
         import { initDigitalHuman } from './src/three/DigitalHuman.js';
+        import { chatApi } from './src/api/index.js';
 
+        // ==== 3D 数字人 ====
         const container = document.getElementById('dhContainer');
         const btn = document.getElementById('tourDigitalHuman');
         const tooltip = document.getElementById('dhTooltip');
@@ -267,9 +405,7 @@
 
         if (container) {
             try {
-                const dh = initDigitalHuman(container);
-                // 3D 初始化成功（至少 renderer 已创建），隐藏 fallback
-                // GLB 加载完成后，model-loaded class 会加到 container 上
+                initDigitalHuman(container);
                 const checkLoaded = setInterval(function() {
                     if (container.classList.contains('model-loaded')) {
                         if (fallback) fallback.classList.add('hidden');
@@ -284,27 +420,99 @@
             }
         }
 
-        // 点击交互
-        let tooltipVisible = true;
+        // ==== 聊天 ====
+        const overlay = document.getElementById('tourChatOverlay');
+        const chatBody = document.getElementById('tourChatBody');
+        const chatInput = document.getElementById('tourChatInput');
+        const chatSend = document.getElementById('tourChatSend');
+        const chatClose = document.getElementById('tourChatClose');
+        let chatBusy = false;
+        let abortCtrl = null;
+
+        function addBubble(role, text) {
+            const div = document.createElement('div');
+            div.className = 'tour-chat-bubble ' + role;
+            div.textContent = text;
+            chatBody.appendChild(div);
+            chatBody.scrollTop = chatBody.scrollHeight;
+            return div;
+        }
+
+        function removeTyping() {
+            const t = chatBody.querySelector('.typing');
+            if (t) t.remove();
+        }
+
+        async function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text || chatBusy) return;
+            chatInput.value = '';
+            addBubble('user', text);
+            chatBusy = true;
+            chatSend.disabled = true;
+            chatInput.disabled = true;
+            const typingEl = addBubble('typing', '登州小吏正在思索...');
+            abortCtrl = new AbortController();
+            try {
+                const prompt = '你是"登州小吏"，登州博物馆的云端导览使，一位学识渊博、谈吐文雅的博物馆讲解员。\n' +
+                    '你在登州博物馆名人厅值守，为游客讲解历史文化。\n' +
+                    '你的回答应使用文言白话相间的风格，简洁而有文采。\n\n' +
+                    '游客问：' + text + '\n\n请以登州小吏的口吻回复：';
+                const res = await chatApi.ask(prompt, abortCtrl.signal);
+                removeTyping();
+                addBubble('assistant', res.answer || '小吏才疏学浅，容后再禀。');
+            } catch(e) {
+                removeTyping();
+                if (e.name !== 'AbortError') {
+                    addBubble('assistant', '小吏暂时无法作答，请稍后再试。');
+                }
+            } finally {
+                chatBusy = false;
+                chatSend.disabled = false;
+                chatInput.disabled = false;
+                chatInput.focus();
+                abortCtrl = null;
+            }
+        }
+
+        function openChat() {
+            overlay.classList.add('open');
+            tooltip.classList.remove('visible');
+            setTimeout(function() { chatInput.focus(); }, 300);
+        }
+
+        function closeChat() {
+            if (abortCtrl) { abortCtrl.abort(); abortCtrl = null; }
+            chatBusy = false;
+            chatSend.disabled = false;
+            chatInput.disabled = false;
+            overlay.classList.remove('open');
+        }
+
+        // 点击数字人 → 打开聊天
         if (btn) {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
-                tooltipVisible = !tooltipVisible;
-                tooltip.classList.toggle('visible', tooltipVisible);
+                if (overlay.classList.contains('open')) {
+                    closeChat();
+                } else {
+                    openChat();
+                }
             });
         }
-        setTimeout(function() { tooltip.classList.add('visible'); }, 1000);
-        setTimeout(function() {
-            tooltip.classList.remove('visible');
-            tooltipVisible = false;
-        }, 8000);
 
-        document.addEventListener('click', function(e) {
-            if (!btn.contains(e.target) && !tooltip.contains(e.target)) {
-                tooltip.classList.remove('visible');
-                tooltipVisible = false;
-            }
+        // 关闭按钮
+        if (chatClose) chatClose.addEventListener('click', closeChat);
+
+        // 发送
+        if (chatSend) chatSend.addEventListener('click', sendMessage);
+        if (chatInput) chatInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') sendMessage();
         });
+
+        // 首次加载显示气泡
+        setTimeout(function() { tooltip.classList.add('visible'); }, 1000);
+        setTimeout(function() { tooltip.classList.remove('visible'); }, 8000);
 
         // 网站浏览统计
         fetch('/api/visits/track', {

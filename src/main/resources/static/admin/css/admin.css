@@ -209,87 +209,81 @@ body {
     margin-top: 4px;
 }
 
-/* ==================== Dashboard 统计卡片 ==================== */
+/* ==================== Dashboard 分区 ==================== */
+.dash-section {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+}
+.dash-section-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--accent);
+    letter-spacing: 0.5px;
+    color: var(--text);
+}
+
+/* ==================== Dashboard 数据统计卡片 ==================== */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 16px;
-    margin-bottom: 32px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
 }
 .stat-card {
-    background: var(--card-bg);
+    background: linear-gradient(135deg, #fdfaf5 0%, #f5f0e8 100%);
     border-radius: 8px;
-    padding: 24px 20px;
-    box-shadow: var(--shadow);
-    transition: transform 0.2s;
+    padding: 20px 18px;
+    text-align: center;
+    transition: all 0.2s;
+    border: 1px solid #ede8e0;
 }
 .stat-card:hover {
     transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(185,148,46,0.12);
+    border-color: var(--accent);
 }
 .stat-card .stat-value {
-    font-size: 32px;
+    font-size: 30px;
     font-weight: 700;
     color: var(--accent);
+    line-height: 1.2;
 }
 .stat-card .stat-label {
     font-size: 12px;
     color: var(--text-secondary);
-    margin-top: 4px;
+    margin-top: 6px;
     letter-spacing: 1px;
 }
 
-/* ==================== 网站浏览统计 ==================== */
-.visit-section {
-    background: var(--card-bg);
-    border-radius: 8px;
-    padding: 20px 24px;
-    margin-bottom: 24px;
-    box-shadow: var(--shadow);
-}
-.visit-section h3 {
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 16px;
-    letter-spacing: 1px;
-    color: var(--text);
-}
-.visit-stats-grid {
+/* ==================== Dashboard 访问统计 ==================== */
+.visit-summary {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
 }
-.visit-card {
-    background: #fafbfc;
+.visit-summary-item {
+    background: #f8f6f2;
     border-radius: 6px;
-    padding: 16px;
+    padding: 14px;
     text-align: center;
-    border: 1px solid var(--border);
+    border: 1px solid #eee8e0;
 }
-.visit-card .visit-value {
-    font-size: 28px;
+.visit-summary-value {
+    font-size: 24px;
     font-weight: 700;
-    color: var(--accent);
+    color: var(--sidebar-bg);
+    line-height: 1.2;
 }
-.visit-card .visit-label {
+.visit-summary-label {
     font-size: 11px;
     color: var(--text-secondary);
     margin-top: 4px;
-    letter-spacing: 1px;
-}
-.visit-card .visit-sub {
-    font-size: 11px;
-    color: #999;
-    margin-top: 2px;
-}
-.visit-chart-wrap {
-    position: relative;
-    width: 100%;
-    height: 120px;
-}
-.visit-chart-wrap canvas {
-    width: 100%;
-    height: 100%;
+    letter-spacing: 0.5px;
 }
 
 /* ==================== 表格 ==================== */
