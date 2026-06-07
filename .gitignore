@@ -36,8 +36,10 @@ build/
 .DS_Store
 Thumbs.db
 
-### Static uploads ###
-uploads/
+### Static uploads — 只忽略开发垃圾，保留资源文件 ###
+uploads/*/node_modules/
+uploads/*/package-lock.json
+uploads/*/package.json
 
 ### Claude ###
 .claude/
