@@ -21,6 +21,20 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    container_name: cloudmuseum-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
   app:
     build: .
     container_name: cloudmuseum-app
@@ -31,6 +45,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/cloud_museum?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
       DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY}
       TEXTCHAT_API_TYPE: ${TEXTCHAT_API_TYPE:-custom}
       TEXTCHAT_API_BASE_URL: ${TEXTCHAT_API_BASE_URL}
@@ -41,9 +57,12 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
       - uploads-data:/app/uploads
 
 volumes:
   mysql-data:
+  redis-data:
   uploads-data:
