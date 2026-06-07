@@ -4,6 +4,8 @@ import com.baicai.cloudmuseum_backend.entity.Article;
 import com.baicai.cloudmuseum_backend.mapper.ArticleMapper;
 import com.baicai.cloudmuseum_backend.service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +17,7 @@ public class ArticleServiceImpl implements ArticleService {
     private ArticleMapper articleMapper;
 
     @Override
+    @Cacheable(value = "articles", key = "'detail:' + #id")
     public Article getById(Long id) {
         Article article = articleMapper.findById(id);
         if (article == null) throw new RuntimeException("文章不存在");
@@ -22,12 +25,14 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    @Cacheable(value = "articles", key = "'list:' + #type + ':' + #page + ':' + #size")
     public List<Article> getPublished(String type, int page, int size) {
         int offset = (page - 1) * size;
         return articleMapper.findPublishedByType(type, offset, size);
     }
 
     @Override
+    @Cacheable(value = "articles", key = "'count:' + #type")
     public int countPublished(String type) {
         return articleMapper.countPublished(type);
     }
@@ -38,6 +43,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    @CacheEvict(value = "articles", allEntries = true)
     public Article create(Article article) {
         if (article.getStatus() == null) article.setStatus("PUBLISHED");
         articleMapper.insert(article);
@@ -45,12 +51,14 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    @CacheEvict(value = "articles", allEntries = true)
     public Article update(Article article) {
         articleMapper.update(article);
         return getById(article.getId());
     }
 
     @Override
+    @CacheEvict(value = "articles", allEntries = true)
     public void delete(Long id) {
         articleMapper.deleteById(id);
     }
