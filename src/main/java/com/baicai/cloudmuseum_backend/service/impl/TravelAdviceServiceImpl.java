@@ -1,7 +1,6 @@
 package com.baicai.cloudmuseum_backend.service.impl;
 
 import com.baicai.cloudmuseum_backend.dao.TextChatApiClient;
-import com.baicai.cloudmuseum_backend.dto.TextChatRequest;
 import com.baicai.cloudmuseum_backend.dto.TextChatResponse;
 import com.baicai.cloudmuseum_backend.dto.TravelAdviceRequest;
 import com.baicai.cloudmuseum_backend.dto.WeatherResponse;
@@ -30,7 +29,7 @@ public class TravelAdviceServiceImpl implements TravelAdviceService {
         result.put("weather", weather);
 
         String prompt = buildPrompt(request, weather);
-        TextChatResponse aiResponse = textChatApiClient.callChatApi(new TextChatRequest(prompt));
+        TextChatResponse aiResponse = textChatApiClient.callChatApi(prompt);
 
         result.put("advice", aiResponse.getAnswer());
         return result;
