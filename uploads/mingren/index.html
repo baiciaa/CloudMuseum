@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>登州博物馆3D漫游</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        /* 全局基础样式 */
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+            background: #0a0a0a; /* 更深的纯黑背景，提升高级感 */
+            font-family: "SimSun", "Microsoft YaHei", serif; /* 宋体+雅黑，贴合博物馆国风 */
+        }
+
+        #application-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            outline: none;
+        }
+
+        /* 加载容器 - 居中+轻微顶部偏移，更符合视觉习惯 */
+        #custom-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #0a0a0a;
+            color: #f5f0e8; /* 米白色文字，替代纯白更柔和 */
+            z-index: 9999;
+            padding-top: -50px;
+        }
+
+        /* 欢迎文字 - 国风质感优化 */
+        .loading-title {
+            font-size: 42px;
+            font-weight: 400; /* 取消粗体，更雅致 */
+            margin-bottom: 50px;
+            letter-spacing: 8px; /* 增大字间距，国风排版感 */
+            color: #e8d9c2; /* 仿宣纸/木色，贴合博物馆调性 */
+            text-shadow: 0 0 10px rgba(232, 217, 194, 0.2); /* 轻微发光，提升层次感 */
+        }
+
+        /* 加载条容器 - 圆角+内阴影，更精致 */
+        .loading-bar-container {
+            width: 600px;
+            height: 6px;
+            background: rgba(80, 70, 60, 0.3); /* 浅木色底，半透明 */
+            border-radius: 3px;
+            overflow: hidden;
+            box-shadow: 
+                0 1px 3px rgba(0, 0, 0, 0.5) inset, /* 内阴影增加深度 */
+                0 0 8px rgba(232, 217, 194, 0.1); /* 外发光，呼应文字 */
+        }
+
+        /* 加载条 - 渐变+动态光效，更高级 */
+        .loading-bar {
+            height: 100%;
+            background: linear-gradient(90deg, 
+                #d4b98c,  /* 浅木色 */
+                #e8d9c2,  /* 宣纸色 */
+                #d4b98c); /* 浅木色 */
+            width: 0%;
+            transition: width 0.3s ease-in-out;
+            border-radius: 3px;
+            /* 加载条光效动画 */
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite linear;
+        }
+
+        /* 光效动画 - 加载条流动感 */
+        @keyframes shimmer {
+            0% { background-position: 0 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* 手机端适配 */
+        @media (max-width: 768px) {
+            .loading-title {
+                font-size: 28px;
+                letter-spacing: 5px;
+                margin-bottom: 40px;
+            }
+            .loading-bar-container {
+                width: 320px;
+                height: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="custom-loader">
+        <div class="loading-title">欢迎来到登州博物馆</div>
+        <div class="loading-bar-container">
+            <div class="loading-bar" id="loading-progress"></div>
+        </div>
+    </div>
+
+    <script src="playcanvas-stable.min.js"></script>
+    <script src="__settings__.js"></script>
+    <script src="__modules__.js"></script>
+    <script src="__start__.js"></script>
+    <script src="__loading__.js"></script>
+    <script src="__game-scripts.js"></script>
+</body>
+</html>
