@@ -46,6 +46,7 @@ uploads/
 *.log
 *.tmp
 application-local.properties
+.env
 
 ### Maven Wrapper ###
 mvnw
